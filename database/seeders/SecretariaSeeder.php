@@ -18,12 +18,14 @@ class SecretariaSeeder extends Seeder
      */
     public function run(): void
     {
+         $role = Role::where('slug', 'secretaria')->first();
+
         User::updateOrCreate(
         ['email'=>'teste@secretaria.gov.br'],
             ['name' => 'Secretaria User',
                 'password' => Hash::make('secretaria123#'),
                 'escola_id' => null,
-                'role_id' => 2, // Secretaria
+                'role_id' =>$role->id, // Secretaria
 
         ]);
     }

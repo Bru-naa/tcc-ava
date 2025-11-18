@@ -9,6 +9,8 @@ class Escola extends Model
 {
    use HasFactory; // para testes
 
+    protected $table = 'escolas';
+
    protected $fillable = [
     'esc_nome',
     'esc_endereco',
@@ -19,6 +21,10 @@ class Escola extends Model
     'esc_tipo',
     'regional_id'
    ];
+   public function reclamacoes()
+  {
+    return $this->hasMany(Reclamacao::class);
+  }
 
    public function cursos ()
    {

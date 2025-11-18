@@ -1,6 +1,6 @@
 <x-layouts.auth>
     <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Log in to your account')" :description="__('Seja bem-vindo(a) de volta!')" />
+        <x-auth-header :title="__('Entrar na sua conta')" :description="__('Seja bem-vindo(a) de volta!')" />
 
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />

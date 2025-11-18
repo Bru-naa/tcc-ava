@@ -9,7 +9,8 @@ class Regional extends Model
 {
     use HasFactory;
 
-    protected $table = 'regional';
+    // nome correto da tabela no seu banco
+    protected $table = 'regionais';
 
     protected $fillable = [
         'reg_nome',
@@ -19,7 +20,7 @@ class Regional extends Model
         'reg_endereco',
         'reg_cidade',
         'reg_estado',
-        'reg_responsavel_nome'
+        'reg_responsavel_nome',
     ];
 
     public function escolas()
