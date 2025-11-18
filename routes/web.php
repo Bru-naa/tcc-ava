@@ -3,14 +3,21 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
+use App\Http\Controllers\ContatoController;
 
 Route::get('/', function () {
     return view('landing-page');
 })->name('landing'); // <-- nome único
 
-Route::get('/home', function () {
+/* Route::get('/home', function () {
     return view('home');
-})->name('home'); // <-- rota pública do usuário comum
+})->name('home'); // <-- rota pública do usuário comum */
+
+
+
+Route::post('/contato/enviar', [ContatoController::class, 'enviar'])->name('contato.enviar');
+
+
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

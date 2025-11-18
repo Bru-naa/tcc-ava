@@ -21,12 +21,14 @@ class CreateNewUser implements CreatesNewUsers
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique(User::class),
-            ],
+    'required',
+    'string',
+    'email',
+    'max:255',
+    Rule::unique(User::class),
+    'regex:/^[a-zA-Z0-9._%+-]+@(secretaria\.gov\.br|professor\.gov\.br|coordenador\.gov\.br)$/'
+],
+
             'password' => $this->passwordRules(),
         ])->validate();
 
