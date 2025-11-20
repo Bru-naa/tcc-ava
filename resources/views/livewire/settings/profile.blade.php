@@ -8,63 +8,38 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     public string $name = '';
-    public string $email = '';
 
-    /**
-     * Mount the component.
-     */
     public function mount(): void
     {
         $this->name = Auth::user()->name;
-        $this->email = Auth::user()->email;
     }
 
-    /**
-     * Update the profile information for the currently authenticated user.
-     */
     public function updateProfileInformation(): void
     {
         $user = Auth::user();
 
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
-
-           /*  'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($user->id)
-            ], */ /* indisponivel no momento */
         ]);
 
         $user->fill($validated);
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
         $user->save();
 
         $this->dispatch('profile-updated', name: $user->name);
+        
+        $this->name = $user->name;
     }
 
-    /**
-     * Send an email verification notification to the current user.
-     */
     public function resendVerificationNotification(): void
     {
         $user = Auth::user();
 
         if ($user->hasVerifiedEmail()) {
             $this->redirectIntended(default: route('dashboard', absolute: false));
-
             return;
         }
 
         $user->sendEmailVerificationNotification();
-
         Session::flash('status', 'verification-link-sent');
     }
 }; ?>
@@ -72,26 +47,37 @@ new class extends Component {
 <section class="w-full">
     @include('partials.settings-heading')
 
-    <x-settings.layout :heading="__('Profile')" :subheading="__('Altere seu nome e email (Obs.: email educacional ainda não pode ser alterado)')">
+    <x-settings.layout :heading="__('Perfil')" :subheading="__('Altere seu nome e email (Obs.: email educacional ainda não pode ser alterado)')">
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
+            <flux:input wire:model="name" :label="__('Nome')" type="text" required autofocus autocomplete="name" />
+
+             <flux:tooltip content="Recarregue para visualizar as mudanças">
+    <flux:button icon="information-circle" icon:variant="outline" />
+</flux:tooltip>
+           
 
             <div>
-                <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" disabled class="opacity-50 cursor-not-allowed" />
+                <flux:input 
+                    value="{{ auth()->user()->email }}" 
+                    :label="__('Email')" 
+                    type="email" 
+                    disabled 
+                    class="opacity-50 cursor-not-allowed" 
+                />
 
                 @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail &&! auth()->user()->hasVerifiedEmail())
                     <div>
                         <flux:text class="mt-4">
-                            {{ __('Your email address is unverified.') }}
+                            {{ __('O seu email não foi verificado.') }}
 
                             <flux:link class="text-sm cursor-pointer" wire:click.prevent="resendVerificationNotification">
-                                {{ __('Click here to re-send the verification email.') }}
+                                {{ __('Clique aqui para reenviar o email de verificação.') }}
                             </flux:link>
                         </flux:text>
 
                         @if (session('status') === 'verification-link-sent')
                             <flux:text class="mt-2 font-medium !dark:text-green-400 !text-green-600">
-                                {{ __('A new verification link has been sent to your email address.') }}
+                                {{ __('Um novo link de verificação foi enviado para o seu email.') }}
                             </flux:text>
                         @endif
                     </div>
@@ -101,12 +87,12 @@ new class extends Component {
             <div class="flex items-center gap-4">
                 <div class="flex items-center justify-end">
                     <flux:button variant="primary" type="submit" class="w-full" data-test="update-profile-button">
-                        {{ __('Save') }}
+                        {{ __('Salvar') }}
                     </flux:button>
                 </div>
 
                 <x-action-message class="me-3" on="profile-updated">
-                    {{ __('Saved.') }}
+                    {{ __('Salvo') }}
                 </x-action-message>
             </div>
         </form>

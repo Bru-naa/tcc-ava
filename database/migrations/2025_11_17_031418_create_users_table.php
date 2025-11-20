@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+
 return new class extends Migration
 {
     /**
@@ -15,18 +16,27 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            // se você tiver uma tabela 'escolas' prefira foreignId; senão remova ->constrained(...)
+            $table->string('username')->unique();
+            $table->string('telefone')->nullable();
+            $table->date('data_nascimento')->nullable();
+            $table->string('cpf')->nullable()->unique();
+            $table->boolean('tema')->default(false);
+          
+
+              $table->string('email')->unique();
+            $table->string('email_institucional')->nullable()->unique();
+
+            $table->enum('status_ativacao', ['ativo', 'pendente'])->default('pendente');
             $table->foreignId('escola_id')->nullable()->constrained('escolas')->nullOnDelete();
            
            
-            $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            // status para controlar autorização/pendente
-           $table->foreignId('role_id')->nullable()->constrained('roles')->nullOnDelete();
-           //Status//
-            
-            // preferência de tema (opcional)
+
+
+       
+             $table->foreignId('role_id')->constrained()->onDelete('cascade');
+        
         
             $table->rememberToken();
             $table->timestamps();

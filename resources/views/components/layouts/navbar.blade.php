@@ -6,6 +6,7 @@
     <title>Home - AvaliaEdu</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @fluxAppearance
+    @livewireStyles
 </head>
 <body>
     <header>
@@ -55,7 +56,7 @@
                     <flux:menu.radio.group>
                         <flux:menu.radio checked>{{ auth()->user()?->name ?? 'Convidado' }}</flux:menu.radio>
                         <flux:radio.group x-data variant="segmented" x-model="$flux.appearance">
-            <flux:radio value="light" icon="sun"></flux:radio>
+            <flux:radio value="light" icon="sun" checked></flux:radio>
             <flux:radio value="dark" icon="moon"></flux:radio>
             <flux:radio value="system" icon="computer-desktop"></flux:radio>
         </flux:radio.group>
@@ -134,5 +135,7 @@
     </header>
 
     @fluxScripts
+    @livewireScripts
+    
 </body>
 </html>

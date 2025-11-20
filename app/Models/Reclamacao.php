@@ -1,40 +1,43 @@
 <?php
 
-namespace App\Livewire\Dashboard;
+namespace App\Models;
 
-use Livewire\Component;
-use App\Models\Escola;
-use App\Models\Reclamacao;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ReclamacoesPorEscola extends Component
+class Reclamacao extends Model
 {
-    public $selectedEscola = null;
-    public $escolas = [];
-    public $total = 0;
-    public $pendentes = 0;
-    public $resolvidas = 0;
+    protected $table = 'reclamacoes';
 
-    public function mount()
+    protected $fillable = [
+        'assunto',
+        'descricao',
+        'status',
+        'data_reclamacao',
+        'data_resolucao',
+        'prioridade',
+        'user_id',
+        'matricula_id',
+        'escola_id'
+    ];
+
+    protected $casts = [
+        'data_reclamacao' => 'datetime',
+        'data_resolucao' => 'datetime',
+    ];
+
+    public function user(): BelongsTo
     {
-        $this->escolas = Escola::orderBy('esc_nome')->get();
+        return $this->belongsTo(User::class);
     }
 
-    public function updatedSelectedEscola($id)
+    public function matricula(): BelongsTo
     {
-        if (!$id) {
-            $this->total = 0;
-            $this->pendentes = 0;
-            $this->resolvidas = 0;
-            return;
-        }
-
-        $this->total = Reclamacao::where('escola_id', $id)->count();
-        $this->pendentes = Reclamacao::where('escola_id', $id)->where('status', 'pendente')->count();
-        $this->resolvidas = Reclamacao::where('escola_id', $id)->where('status', 'resolvida')->count();
+        return $this->belongsTo(Matricula::class);
     }
 
-    public function render()
+    public function escola(): BelongsTo
     {
-        return view('livewire.dashboard.reclamacoes-por-escola');
+        return $this->belongsTo(Escola::class);
     }
 }

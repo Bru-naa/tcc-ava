@@ -21,6 +21,8 @@ module.exports = {
   },
   plugins: [
     require("fluxui"),
+    require('@tailwindcss/typography'),
+    require('preline/plugin'),
   
   ],
 };

@@ -18,8 +18,7 @@ class DatabaseSeeder extends Seeder
             RegionalSeeder::class,
             EscolaSeeder::class,
              RoleSeeder::class,
-            AdminSeeder::class,
-            SecretariaSeeder::class,
+            UserSeeder::class,
            
         ]);
 

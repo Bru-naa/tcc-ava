@@ -2,44 +2,55 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
+
+         @livewireStyles
+         
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
         <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
+            @php
+                // Definir a rota do dashboard baseada no role
+                $dashboardRoute = match(auth()->user()->role->acesso) {
+                    'admin' => 'admin.dashboard',
+                    'secretaria' => 'secretaria.home',
+                    'professor' => 'professor.painel',
+                    'coordenador' => 'coordenacao.painel',
+                    'direcao' => 'direcao.painel',
+                    default => 'dashboard'
+                };
+            @endphp
+
+            <a href="{{ route($dashboardRoute) }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
                 <x-app-logo />
             </a>
 
             {{-- MENU PADRÃO (Dashboard etc.) --}}
-<flux:navlist variant="outline">
-    <flux:navlist.group :heading="__('Plataforma')" class="grid">
-        <flux:navlist.item
-            icon="home"
-            :href="route('dashboard')"
-            :current="request()->routeIs('dashboard')"
-            wire:navigate
-        >
-            {{ __('Dashboard') }}
-        </flux:navlist.item>
-    </flux:navlist.group>
-</flux:navlist>
+            <flux:navlist variant="outline">
+                <flux:navlist.group :heading="__('Plataforma')" class="grid">
+                    <flux:navlist.item
+                        icon="home"
+                        :href="route($dashboardRoute)"
+                        :current="request()->routeIs([
+                            'dashboard', 
+                            'admin.dashboard', 
+                            'secretaria.home', 
+                            'professor.painel', 
+                            'coordenacao.painel', 
+                            'direcao.painel'
+                        ])"
+                        wire:navigate
+                    >
+                        {{ __('Home') }}
+                    </flux:navlist.item>
+                </flux:navlist.group>
+            </flux:navlist>
 
-{{-- MENU ESPECÍFICO POR PERFIL --}}
-@includeIf('menus.' . auth()->user()->role->slug)
-
+            {{-- MENU ESPECÍFICO POR PERFIL --}}
+            @includeIf('menus.' . auth()->user()->role->slug)
 
             <flux:spacer />
-
-            <!-- <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                {{ __('Repository') }}
-                </flux:navlist.item>
-
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                {{ __('Documentation') }}
-                </flux:navlist.item>
-            </flux:navlist> -->
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">
@@ -74,6 +85,11 @@
 
                     <flux:menu.radio.group>
                         <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Configurações') }}</flux:menu.item>
+                    </flux:menu.radio.group>
+                  
+                   <flux:menu.separator />
+                    <flux:menu.radio.group>
+                        <flux:menu.item><flux:switch x-data x-model="$flux.dark" label="Dark mode"  /></flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
@@ -141,5 +157,6 @@
         {{ $slot }}
 
         @fluxScripts
+         @livewireScripts
     </body>
 </html>
