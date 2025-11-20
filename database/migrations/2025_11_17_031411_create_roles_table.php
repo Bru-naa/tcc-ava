@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
     $table->string('name'); // Secretaria, Professor, Coordenador, Direção
-    $table->string('slug')->unique(); // secretaria, professor, coordenador, direcao
+    $table->enum('acesso', ['admin', 'professor', 'coordenador','secretaria','direcao']); // nível de acesso
     $table->text('description')->nullable(); // descrição do papel
     $table->timestamps();
         });

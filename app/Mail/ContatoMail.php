@@ -3,24 +3,58 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class ContatoMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $dados;
+    public $data;
 
-    public function __construct($dados)
+    /**
+     * Create a new message instance.
+     */
+    public function __construct($data)
     {
-        $this->dados = $dados;
+        $this->data = $data;
     }
 
-    public function build()
+    /**
+     * Get the message envelope.
+     */
+    public function envelope(): Envelope
     {
-        return $this->view('emails.contato')
-                    ->with('dados', $this->dados)
-                    ->subject($this->dados['assunto']);
+        return new Envelope(
+            subject: 'Nova Mensagem de Contato: ' . $this->data['assunto'],
+        );
+    }
+
+    /**
+     * Get the message content definition.
+     */
+    public function content(): Content
+    {
+        return new Content(
+            view: 'emails.contato',
+            with: [
+                'email' => $this->data['email'],
+                'assunto' => $this->data['assunto'],
+                'mensagem' => $this->data['mensagem'],
+            ],
+        );
+    }
+
+    /**
+     * Get the attachments for the message.
+     *
+     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     */
+    public function attachments(): array
+    {
+        return [];
     }
 }

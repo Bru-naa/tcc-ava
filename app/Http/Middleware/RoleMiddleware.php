@@ -8,23 +8,33 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         $user = auth()->user();
 
-        //Se não estiver logado com o perfil adequado, redireciona para o login
-        if (! $user){
-            redirect()->route('login')->send();
+        if (! $user) {
+            return redirect()->route('login');
         }
-         
-        if (! in_array($user->role->slug, $roles)){
-            abort(403, 'Acesso negado, utiliador sem permissão.');
+
+        // Verifica se o usuário tem role
+        if (! $user->role) {
+            abort(403, 'Usuário sem perfil definido.');
         }
+
+        // Verifica se o acesso está na lista permitida
+        if (! in_array($user->role->acesso, $roles)) {
+           
+            // log
+            \Log::warning("Tentativa de acesso não autorizado", [
+                'user_id' => $user->id,
+                'user_role' => $user->role->acesso,
+                'required_roles' => $roles,
+                'route' => $request->route()->getName()
+            ]);
+            
+            abort(403, 'Acesso negado. Permissão necessária: ' . implode(', ', $roles));
+        }
+
         return $next($request);
     }
 }
