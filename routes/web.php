@@ -78,6 +78,12 @@ Route::middleware(['auth', 'verified', 'role:direcao'])
     });
 
 // CONFIGURAÇÕES
+Route::middleware(['auth'])->group(function () {
+    Route::get('settings', function() {
+        return redirect()->route('profile.edit');
+    })->name('settings');
+});
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

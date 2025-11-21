@@ -12,7 +12,7 @@
 
             <!-- Nome -->
             <flux:input
-                name="username"
+                name="name"
                 :label="__('Nome*')"
                 type="text"
                 required
@@ -127,15 +127,71 @@
             />
 
             <!-- Termos de Uso -->
-            <flux:field variant="inline">
+            <!-- Termos de Uso -->
+<flux:field variant="inline">
     <flux:checkbox wire:model="terms" />
-
-    <flux:label>Eu li e concordo com os termos de uso (Obrigatório)*</flux:label>
-
+    <flux:label>
+        <a 
+            href="#"
+            class="bg-transparent border-none p-0 m-0 text-sm font-medium 
+                   text-gray-800 dark:text-white 
+                   hover:underline focus:outline-none"
+            aria-haspopup="dialog" 
+            aria-expanded="false" 
+            aria-controls="hs-scroll-inside-body-modal" 
+            data-hs-overlay="#hs-scroll-inside-body-modal">
+            Eu li e concordo com os Termos de Uso (Obrigatório)*
+        </a>
+    </flux:label>
     <flux:error name="terms" />
 </flux:field>
 
+            <!-- Modal de Termos de Uso -->
+            <div id="hs-scroll-inside-body-modal" 
+                 class="hs-overlay hidden size-full fixed top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" 
+                 role="dialog" 
+                 tabindex="-1" 
+                 aria-labelledby="hs-scroll-inside-body-modal-label">
 
+                <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-lg sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto">
+                    <div class="max-h-full overflow-hidden flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
+                        
+                        <!-- Cabeçalho -->
+                        <div class="flex justify-between items-center py-3 px-4 border-b border-gray-200 dark:border-neutral-700">
+                            <h3 id="hs-scroll-inside-body-modal-label" class="font-bold text-gray-800 dark:text-white">
+                                Termos de Uso
+                            </h3>
+                            <button type="button" 
+                                    class="size-8 inline-flex justify-center items-center rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400" 
+                                    aria-label="Close" 
+                                    data-hs-overlay="#hs-scroll-inside-body-modal">
+                                ✕
+                            </button>
+                        </div>
+
+                        <!-- Conteúdo -->
+                        <div class="p-4 overflow-y-auto space-y-3 text-sm text-gray-600 dark:text-neutral-400">
+                            <p>Ao criar uma conta, você concorda com estes Termos de Uso.</p>
+                            <p><strong>1.</strong> Seus dados serão tratados conforme a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018).</p>
+                            <p><strong>2.</strong> Você se compromete a fornecer informações verdadeiras e a não utilizar a plataforma para fins ilegais.</p>
+                            <p><strong>3.</strong> Reservamo-nos o direito de suspender contas que violem nossos termos.</p>
+                            <p><strong>4.</strong> Ao continuar, você confirma ter lido e concordado com os Termos.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t border-gray-200 dark:border-neutral-700">
+                            <button type="button" 
+                                    class="py-2 px-3 text-sm font-medium rounded-lg 
+               border border-gray-200 bg-yellow-400 text-gray-800 
+               hover:bg-yellow-300 
+               dark:border-neutral-700 dark:text-gray-900" 
+                                    data-hs-overlay="#hs-scroll-inside-body-modal">
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Botão de Cadastro -->
             <div class="flex items-center justify-end mt-4">
@@ -153,5 +209,4 @@
     </div>
 
     <flux:button x-data x-on:click="$flux.dark = ! $flux.dark" icon="moon" variant="subtle" aria-label="Toggle dark mode" class="mx-auto"/>
-    
 </x-layouts.auth>
