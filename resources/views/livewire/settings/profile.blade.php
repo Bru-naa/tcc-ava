@@ -3,7 +3,6 @@
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -16,18 +15,18 @@ new class extends Component {
 
     public function updateProfileInformation(): void
     {
-        $user = Auth::user();
-
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
         ]);
 
+        $user = Auth::user();
         $user->fill($validated);
         $user->save();
 
-        $this->dispatch('profile-updated', name: $user->name);
-        
         $this->name = $user->name;
+
+        $this->dispatch('profile-updated', name: $user->name);
+        $this->emit('nameUpdated', $user->name);
     }
 
     public function resendVerificationNotification(): void
@@ -42,19 +41,15 @@ new class extends Component {
         $user->sendEmailVerificationNotification();
         Session::flash('status', 'verification-link-sent');
     }
-}; ?>
+};
+?>
 
 <section class="w-full">
     @include('partials.settings-heading')
 
-    <x-settings.layout :heading="__('Perfil')" :subheading="__('Altere seu nome e email (Obs.: email educacional ainda não pode ser alterado)')">
-        <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
+    <x-settings.layout :heading="__('Perfil')" :subheading="__('Altere seu nome e email')">
+        <form wire:submit.prevent="updateProfileInformation" class="my-6 w-full space-y-6">
             <flux:input wire:model="name" :label="__('Nome')" type="text" required autofocus autocomplete="name" />
-
-             <flux:tooltip content="Recarregue para visualizar as mudanças">
-    <flux:button icon="information-circle" icon:variant="outline" />
-</flux:tooltip>
-           
 
             <div>
                 <flux:input 
@@ -65,11 +60,10 @@ new class extends Component {
                     class="opacity-50 cursor-not-allowed" 
                 />
 
-                @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail &&! auth()->user()->hasVerifiedEmail())
+                @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !auth()->user()->hasVerifiedEmail())
                     <div>
                         <flux:text class="mt-4">
                             {{ __('O seu email não foi verificado.') }}
-
                             <flux:link class="text-sm cursor-pointer" wire:click.prevent="resendVerificationNotification">
                                 {{ __('Clique aqui para reenviar o email de verificação.') }}
                             </flux:link>
@@ -100,3 +94,12 @@ new class extends Component {
         <livewire:settings.delete-user-form />
     </x-settings.layout>
 </section>
+
+<script>
+    document.addEventListener('livewire:load', () => {
+        Livewire.on('nameUpdated', (newName) => {
+            const nameElements = document.querySelectorAll('.user-name-display');
+            nameElements.forEach(el => el.textContent = newName);
+        });
+    });
+</script>

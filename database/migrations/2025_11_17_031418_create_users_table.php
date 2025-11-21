@@ -15,16 +15,12 @@ return new class extends Migration
         // users
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('username')->unique();
-            $table->string('telefone')->nullable();
-            $table->date('data_nascimento')->nullable();
-            $table->string('cpf')->nullable()->unique();
+            $table->string('name')->unique();
             $table->boolean('tema')->default(false);
           
 
               $table->string('email')->unique();
-            $table->string('email_institucional')->nullable()->unique();
+
 
             $table->enum('status_ativacao', ['ativo', 'pendente'])->default('pendente');
             $table->foreignId('escola_id')->nullable()->constrained('escolas')->nullOnDelete();

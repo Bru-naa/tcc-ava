@@ -25,15 +25,15 @@
         >
             <div x-show="!showRecoveryInput">
                 <x-auth-header
-                    :title="__('Código de Autenticação')"
-                    :description="__('Insira o seu código de autenticação, disponível no seu app authenticator (Ex.: Google, microsoft, etc.) ')"
+                    :title="__('Authentication Code')"
+                    :description="__('Enter the authentication code provided by your authenticator application.')"
                 />
             </div>
 
             <div x-show="showRecoveryInput">
                 <x-auth-header
-                    :title="__('Código de Recuperação')"
-                    :description="__('Por favor, confirme o acesso à sua conta inserindo um dos seus códigos de recuperação de emergência.')"
+                    :title="__('Recovery Code')"
+                    :description="__('Please confirm access to your account by entering one of your emergency recovery codes.')"
                 />
             </div>
 
@@ -87,10 +87,10 @@
                 </div>
 
                 <div class="mt-5 space-x-0.5 text-sm leading-5 text-center">
-                    <span class="opacity-50">{{ __('or you can') }}</span>
+                    <span class="opacity-50">{{ __('ou você pode') }}</span>
                     <div class="inline font-medium underline cursor-pointer opacity-80">
-                        <span x-show="!showRecoveryInput" @click="toggleInput()">{{ __('login using a recovery code') }}</span>
-                        <span x-show="showRecoveryInput" @click="toggleInput()">{{ __('login using an authentication code') }}</span>
+                        <span x-show="!showRecoveryInput" @click="toggleInput()">{{ __('realizar login usando o recovery code') }}</span>
+                        <span x-show="showRecoveryInput" @click="toggleInput()">{{ __('realizar login usando o código de autenticação') }}</span>
                     </div>
                 </div>
             </form>

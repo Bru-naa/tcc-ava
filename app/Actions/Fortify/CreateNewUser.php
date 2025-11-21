@@ -3,38 +3,52 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use App\Models\PreRegistro;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
+use Illuminate\Support\Str;
+use App\Models\PreRegistro;
 
 class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules;
 
-    /**
-     * Validate and create a newly registered user.
-     *
-     * @param  array<string, string>  $input
-     */
-   public function create(array $input): User
-{
-    Validator::make($input, [
-        'username' => ['required', 'string', 'max:255'],
-        'email' => [
-            'required',
-            'string',
-            'email',
-            'max:255',
-            Rule::unique(User::class),
-            'regex:/^[a-zA-Z0-9._%+-]+@(secretaria\.gov\.br|professor\.gov\.br|coordenador\.gov\.br)$/'
-        ],
-        'password' => $this->passwordRules(),
-    ])->validate();
+    public function create(array $input): User
+    {
+        Validator::make($input, [
+            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::exists('pre_registro', 'email_institucional')->where('status', 'pendente')
+            ],
+            'password' => $this->passwordRules(),
+        ], [
+            'email.exists' => 'Email institucional não encontrado ou já ativado.'
+        ])->validate();
 
-    return User::create([
-        'username' => $input['username'], 
-        'email'    => $input['email'],   
-        'password' => bcrypt($input['password']), 
-    ]);
-}
+        // Busca o pré-registro
+        $preRegistro = PreRegistro::where('email_institucional', $input['email'])
+                                 ->where('status', 'pendente')
+                                 ->firstOrFail();
+
+        // Cria o usuário
+        $user = User::create([
+            'username' => $input['username'],
+            'email' => $preRegistro->email_institucional, 
+            'password' => Hash::make($input['password']),
+            'role_id' => $preRegistro->role_id,
+            'escola_id' => $preRegistro->escola_id,
+            'status_ativacao' => 'ativo',
+        ]);
+
+        // Atualiza o pré-registro
+        $preRegistro->update(['status' => 'ativado']);
+
+        return $user;
+    }
 }

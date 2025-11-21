@@ -56,7 +56,7 @@ new class extends Component {
             <flux:heading size="lg" level="3">{{ __('2FA Recovery Codes') }}</flux:heading>
         </div>
         <flux:text variant="subtle">
-            {{ __('Recovery codes let you regain access if you lose your 2FA device. Store them in a secure password manager.') }}
+            {{ __('Códigos de recuperação permitem que você recupere o acesso caso perca seu dispositivo de autenticação em duas etapas (2FA). Armazene-os em um gerenciador de senhas seguro.') }}
         </flux:text>
     </div>
 
