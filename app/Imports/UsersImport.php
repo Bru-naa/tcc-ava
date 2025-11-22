@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Models\User;
+use App\Models\PreRegistro;
 use App\Models\Role;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -12,12 +12,11 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Validators\Failure;
 use Maatwebsite\Excel\Concerns\Importable;
-
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\SenhaTemporariaMail;
+use App\Mail\AtivacaoContaMail;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class UsersImport implements ToCollection, WithHeadingRow, WithValidation, SkipsOnFailure
+class UsersImport implements ToCollection, WithHeadingRow, WithValidation, SkipsOnFailure, SkipsEmptyRows
 {
     use Importable;
 
@@ -30,74 +29,71 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, Skips
         $this->escolaId = $escolaId;
     }
 
+    private function limparContato($contato)
+    {
+         return preg_replace('/[^0-9]/', '', (string) $contato);
+    }
+
     public function collection(Collection $rows)
     {
+        $filteredRows = $rows->filter(function ($row) {
+            return isset($row['nome']) &&
+                   !empty(trim($row['nome'])) &&
+                   isset($row['email_pessoal']) &&
+                   !empty(trim($row['email_pessoal']));
+        });
+
         \Log::info('=== INICIANDO IMPORTAÇÃO ===');
         \Log::info('Total de linhas na planilha: ' . $rows->count());
-        \Log::info('Escola ID: ' . $this->escolaId);
-        
-        foreach ($rows as $index => $row) {
-            try {
-                \Log::info("--- Processando linha " . ($index + 2) . " ---");
-                \Log::info('Dados da linha: ' . json_encode($row));
-                
-                // Validação manual adicional
-                $this->validarDados($row);
+        \Log::info('Linhas válidas: ' . $filteredRows->count());
 
-                \Log::info('✅ Dados válidos');
+        if ($filteredRows->count() === 0) {
+            \Log::warning('Nenhuma linha válida encontrada.');
+            return;
+        }
+
+        foreach ($filteredRows as $index => $row) {
+            try {
+                \Log::info("Processando linha: " . json_encode($row));
+
+                $this->validarDados($row);
 
                 $emailInstitucional = $this->gerarEmailInstitucional(
                     $row['nome'], 
                     $row['acesso']
                 );
 
-                \Log::info('Email institucional gerado: ' . $emailInstitucional);
-
                 $role = Role::where('acesso', $row['acesso'])->first();
 
                 if (!$role) {
-                    throw new \Exception("Função '{$row['acesso']}' não encontrada no sistema");
+                    throw new \Exception("Função não encontrada");
                 }
 
-                \Log::info('Role encontrada: ' . $role->acesso . ' (ID: ' . $role->id . ')');
+                $preRegistro = PreRegistro::create([
+                    'nome' => $row['nome'],
+                    'cpf' => $row['cpf'],
+                    'data_nascimento' => $row['data_nascimento'],
+                    'email_pessoal' => $row['email_pessoal'],
+                    'contato' => $this->limparContato($row['contato']),
+                    'email_institucional' => $emailInstitucional,
+                    'escola_id' => $this->escolaId,
+                    'role_id' => $role->id,
+                    'status' => 'pendente',
+                ]);
 
-                \Log::info('Tentando criar usuário no banco...');
-                
-                // Cria o usuário e armazena em variável para debug
-               $senhaTemporaria = Str::random(8);
+                Mail::to($preRegistro->email_pessoal)->send(new AtivacaoContaMail($preRegistro));
 
-$user = User::create([
-    'nome' => $row['nome'],
-    'cpf' => $row['cpf'],
-    'data_nascimento' => $row['data_nascimento'],
-    'acesso' => $row['acesso'],
-    'email' => $row['email_pessoal'],
-    'email_institucional' => $emailInstitucional,
-    'contato' => $row['contato'],
-    'escola_id' => $this->escolaId,
-    'role_id' => $role->id,
-    'status' => 'pendente',
-    'password' => Hash::make($senhaTemporaria),
-]);
-
-// Adicione o envio de email aqui
-Mail::to($user->email)->send(new SenhaTemporariaMail($senhaTemporaria, $emailInstitucional));
-
-                \Log::info('🎉 USUÁRIO CRIADO COM SUCESSO! ID: ' . $user->id);
                 $this->rowCount++;
 
             } catch (\Exception $e) {
-                \Log::error('❌ ERRO na linha ' . ($index + 2) . ': ' . $e->getMessage());
+                \Log::error('ERRO: ' . $e->getMessage());
                 $this->errors[] = "Linha " . ($index + 2) . ": " . $e->getMessage();
             }
         }
 
-        \Log::info("=== IMPORTAÇÃO CONCLUÍDA ===");
-        \Log::info("Total de usuários criados: " . $this->rowCount);
-        \Log::info("Total de erros: " . count($this->errors));
+        \Log::info("Importação concluída: " . $this->rowCount . " registros");
 
         if (!empty($this->errors)) {
-            \Log::error("Erros encontrados: " . implode(" | ", $this->errors));
             throw new \Exception(implode("\n", $this->errors));
         }
     }
@@ -105,12 +101,12 @@ Mail::to($user->email)->send(new SenhaTemporariaMail($senhaTemporaria, $emailIns
     public function rules(): array
     {
         return [
-            '*.nome' => 'required|string|max:255',
-            '*.cpf' => 'required|string|max:14',
-            '*.data_nascimento' => 'required|date',
-            '*.acesso' => 'required|in:professor,coordenador,direcao,secretaria',
-            '*.email_pessoal' => 'required|email',
-            '*.contato' => 'required|string',
+            '*.nome' => 'nullable|string|max:255',
+            '*.cpf' => 'nullable|string|max:14',
+            '*.data_nascimento' => 'nullable|date',
+            '*.acesso' => 'nullable|in:professor,coordenador,direcao,secretaria',
+            '*.email_pessoal' => 'nullable|email',
+            '*.contato' => 'nullable|string',
         ];
     }
 
@@ -127,7 +123,7 @@ Mail::to($user->email)->send(new SenhaTemporariaMail($senhaTemporaria, $emailIns
     {
         $domains = [
             'professor' => '@professor.gov.br',
-            'coordenador' => '@coordenacao.gov.br',
+            'coordenador' => '@coordenacao.gov.br', 
             'direcao' => '@direcao.gov.br',
             'secretaria' => '@secretaria.gov.br'
         ];
@@ -140,7 +136,7 @@ Mail::to($user->email)->send(new SenhaTemporariaMail($senhaTemporaria, $emailIns
         $counter = 1;
         $finalEmail = $baseEmail;
         
-        while (User::where('email_institucional', $finalEmail)->exists()) {
+        while (PreRegistro::where('email_institucional', $finalEmail)->exists()) {
             $finalEmail = $username . $counter . $domain;
             $counter++;
         }
@@ -164,29 +160,31 @@ Mail::to($user->email)->send(new SenhaTemporariaMail($senhaTemporaria, $emailIns
 
     private function validarDados($row)
     {
-        \Log::info('Validando dados...');
-
-        // Verifica se todos os campos obrigatórios existem
         $camposObrigatorios = ['nome', 'cpf', 'data_nascimento', 'acesso', 'email_pessoal', 'contato'];
         foreach ($camposObrigatorios as $campo) {
             if (!isset($row[$campo]) || empty($row[$campo])) {
-                throw new \Exception("Campo obrigatório '{$campo}' está vazio ou não existe");
+                throw new \Exception("Campo obrigatório '{$campo}' está vazio");
             }
         }
+
+        $contato = $this->limparContato($row['contato']);
+
+    if (strlen($contato) < 8 || strlen($contato) > 12) {
+        throw new \Exception("Contato inválido: informe um número com 8 a 12 dígitos");
+    }
+
 
         if ($row['acesso'] === 'admin') {
             throw new \Exception('Não é permitido criar usuários admin via planilha');
         }
 
-        if (User::where('cpf', $row['cpf'])->exists()) {
-            throw new \Exception("CPF {$row['cpf']} já cadastrado");
+        if (PreRegistro::where('cpf', $row['cpf'])->exists()) {
+            throw new \Exception("CPF já cadastrado");
         }
 
-        if (User::where('email', $row['email_pessoal'])->exists()) {
-            throw new \Exception("Email pessoal {$row['email_pessoal']} já cadastrado");
+        if (PreRegistro::where('email_pessoal', $row['email_pessoal'])->exists()) {
+            throw new \Exception("Email pessoal já cadastrado");
         }
-
-        \Log::info('✅ Validação concluída com sucesso');
     }
 
     public function getRowCount(): int
