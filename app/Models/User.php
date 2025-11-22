@@ -2,70 +2,42 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
-
-use App\Models\Role;
+use Illuminate\Database\Eloquent\Factories\HasFactory; 
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-        'name',
-        'username',
-        'telefone',
-        'data_nascimento',
-        'cpf',
-        'email',
-        'email_institucional',
+        'name',     
+        'email',    //  Será o email_institucional
         'status_ativacao',
         'escola_id',
         'password',
         'role_id',
-
-        
+       
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
-        'two_factor_secret',
+        'two_factor_secret', 
         'two_factor_recovery_codes',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'tema' => 'boolean', // campo tema
         ];
     }
 
-    /**
-     * Get the user's initials
-     */
-     public function initials()
+    public function initials()
     {
         $parts = explode(' ', $this->name);
         $initials = '';
@@ -77,22 +49,19 @@ class User extends Authenticatable
         return $initials;
     }
     
- public function role()
+    public function role()
     {
         return $this->belongsTo(Role::class);
     }
 
-
     public function escola()
     {
         return $this->belongsTo(Escola::class);
-    }   
+    }
+
+   
+    public function preRegistro()
+    {
+        return $this->hasOne(PreRegistro::class, 'email_institucional', 'email');
+    }
 }
-    
-
-
-
-   
-        
-   
-

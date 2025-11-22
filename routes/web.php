@@ -6,22 +6,16 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\ContatoController;
 use App\Http\Controllers\UserImportController; 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PreCadastroController;
+use App\Models\Role;
+use App\Models\Escola;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('landing-page');
 })->name('landing');
-/* 
-Route::fallback(function () {
-    return redirect('/');
-}); */
-
 
 Route::post('/contato/enviar', [ContatoController::class, 'enviar'])->name('contato.enviar');
-
-/* Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard'); */
-
 
 // Rotas da Secretaria
 Route::middleware(['auth', 'verified', 'role:secretaria']) 
@@ -29,12 +23,19 @@ Route::middleware(['auth', 'verified', 'role:secretaria'])
     ->name('secretaria.')
     ->group(function () {
         Route::get('/home', function () {
-            return view('perfis.secretaria.sec-home');
-        })->name('home');
+            $roles = Role::where('acesso', '!=', 'admin')->get();
+            $escolas = in_array(Auth::user()->role->acesso, ['secretaria', 'direcao'])
+                        ? collect([Auth::user()->escola])
+                        : Escola::all();
 
-        Route::post('/importar-usuarios', [UserImportController::class, 'import'])
-            ->name('users.import');
-            
+            return view('perfis.secretaria.sec-home', compact('roles', 'escolas'));
+        })->name('home');
+       
+        Route::get('/pre-cadastro', [PreCadastroController::class, 'create'])->name('pre-cadastro.create');
+        Route::post('/pre-cadastro', [PreCadastroController::class, 'store'])->name('pre-cadastro.store');
+
+        /* Route::post('/importar-usuarios', [UserImportController::class, 'import'])
+            ->name('usuarios.import'); */
     });
 
 // Rotas para Admin
@@ -44,7 +45,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])
     ->group(function () {
         Route::get('/dashboard', function () {
             return view('perfis.admin.dashboard');
-        })->name('admin.dashboard');
+        })->name('dashboard');
     });
 
 // Rotas para Professor  
@@ -82,10 +83,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings', function() {
         return redirect()->route('profile.edit');
     })->name('settings');
-});
 
-
-Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
@@ -98,8 +96,8 @@ Route::middleware(['auth'])->group(function () {
                 Features::canManageTwoFactorAuthentication()
                 && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
                 ['password.confirm'],
-                [],
-            ),
+                []
+            )
         )
         ->name('two-factor.show');
 });

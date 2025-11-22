@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Support\Facades\DB;
@@ -25,47 +24,47 @@ class UserSeeder extends Seeder
             // Administrador
             [
                 'name' => 'Administrador Sistema',
-                'username'=>'admin',
                 'email' => 'admin@avaliaedu.com',
-                'password' => Hash::make('admin123#'),
+                'password' => Hash::make('Admin123#!'),
                 'escola_id' => null,
                 'role_id' => $adminRoleId,
+                'status_ativacao' => 'ativo',
             ],
             // Secretaria
             [
                 'name' => 'Teste - Secretaria',
-                'username'=>'secretaria',
                 'email' => 'teste@secretaria.gov.br',
-                'password' => Hash::make('secretaria123#'),
-                'escola_id' => 1, // ajuste conforme sua escola de teste
+                'password' => Hash::make('Secretaria123#!'),
+                'escola_id' => 1,
                 'role_id' => $secretariaRoleId,
+                'status_ativacao' => 'ativo',
             ],
             // Direção
             [
-                'name' => ' Diretor',
-                'username'=>'direcao',
+                'name' => 'Diretor', 
                 'email' => 'teste@direcao.gov.br',
-                'password' => Hash::make('direcao123#'),
+                'password' => Hash::make('Direcao123#!'),
                 'escola_id' => 1,
                 'role_id' => $direcaoRoleId,
+                'status_ativacao' => 'ativo',
             ],
             // Coordenação
             [
                 'name' => 'Coordenadora',
-                'username'=>'coordenacao',
                 'email' => 'teste@coordenador.gov.br',
-                'password' => Hash::make('coordenacao123#'),
+                'password' => Hash::make('Coordenacao123#!'),
                 'escola_id' => 1,
                 'role_id' => $coordenadorRoleId,
+                'status_ativacao' => 'ativo',
             ],
             // Professor
             [
                 'name' => 'Professor',
-                'username'=>'professor',
                 'email' => 'teste@professor.gov.br',
-                'password' => Hash::make('professor123#'),
+                'password' => Hash::make('Professor123#!'),
                 'escola_id' => 1,
                 'role_id' => $professorRoleId,
+                'status_ativacao' => 'ativo',
             ],
         ];
 

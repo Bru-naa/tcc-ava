@@ -2,7 +2,7 @@
     <div class="flex flex-col gap-6">
         <x-auth-header 
             :title="__('Seja bem-vindo(a)')" 
-            :description="__('Preencha todos os campos abaixo, para realizar o seu cadastro')" 
+            :description="__('Preencha todos os campos abaixo, para finalizar o seu cadastro')" 
         />
 
         <x-auth-session-status class="text-center" :status="session('status')" />
@@ -11,66 +11,67 @@
             @csrf
 
             <!-- Nome -->
-            <flux:input
-                name="name"
-                :label="__('Nome*')"
-                type="text"
-                required
-                autofocus
-                autocomplete="name"
-                :placeholder="__('Digite seu nome completo...')"
-            />
+            <div class="w-full max-w-lg">
+                <flux:input
+                    name="name"
+                    :label="__('Nome*')"
+                    type="text"
+                    required
+                    autofocus
+                    autocomplete="name"
+                    :placeholder="__('Digite seu nome completo...')"
+                />
+            </div>
 
             <!-- Email -->
-            <div class="relative w-full max-w-lg">
-                <flux:input
-                    name="email"
-                    x-model="email"
-                    :label="__('Email educacional:')"
-                    type="email"
-                    required
-                    autocomplete="email"
-                    placeholder="email@example.com"
-                    class="pr-10"
-                    id="email"
-                    aria-describedby="email-help"
-                    regexp="^[a-zA-Z0-9._%+-]+@(secretaria\.gov\.br|professor\.gov\.br|coordenador\.gov\.br)$"
-                />
+           <div class="relative w-full max-w-lg" x-data="{ email: '' }">
+    <flux:input
+        name="email"
+        x-model="email"
+        :label="__('Email educacional:')"
+        type="email"
+        required
+        autocomplete="email"
+        placeholder="email@example.com"
+        class="pr-10"
+        id="email"
+        aria-describedby="email-help"
+        pattern="^[a-zA-Z0-9._%+-]+@(secretaria\.gov\.br|professor\.gov\.br|coordenador\.gov\.br)$"
+    />
 
-                <div class="absolute top-1 right-2 flex items-center pointer-events-auto">
-                    <flux:tooltip toggleable placement="top">
-                        <flux:button
-                            icon="information-circle"
-                            size="sm"
-                            variant="ghost"
-                            class="p-0"
-                            aria-label="Informação sobre e-mail"
-                            aria-controls="email-help"
-                            aria-expanded="false"
-                        />
-                        <flux:tooltip.content id="email-help" class="max-w-[20rem] space-y-2">
-                            <p>Os domínios permitidos são:</p>
-                            <ul class="list-disc list-inside text-sm">
-                                <li>@secretaria.gov.br</li>
-                                <li>@professor.gov.br</li>
-                                <li>@coordenador.gov.br</li>
-                                <li> Utilize o email educacional que foi enviado para você</li>
-                                <li><strong>Precisa de ajuda? Entre em contato com o suporte</strong></li>
-                            </ul>
-                        </flux:tooltip.content>
-                    </flux:tooltip>
-                </div>
-            </div>
+    <!-- Ícone e Tooltip -->
+    <div class="absolute top-9 right-2 flex items-center pointer-events-auto">
+        <flux:tooltip toggleable placement="top">
+            <flux:button
+                icon="information-circle"
+                size="sm"
+                variant="ghost"
+                class="p-0"
+                aria-label="Informação sobre e-mail"
+                aria-controls="email-help"
+            />
+            <flux:tooltip.content id="email-help" class="max-w-[20rem] space-y-2">
+                <p>Os domínios permitidos são:</p>
+                <ul class="list-disc list-inside text-sm">
+                    <li>@secretaria.gov.br</li>
+                    <li>@professor.gov.br</li>
+                    <li>@coordenador.gov.br</li>
+                    <li>Utilize o email educacional enviado para você</li>
+                    <li><strong>Precisa de ajuda? Contate o suporte</strong></li>
+                </ul>
+            </flux:tooltip.content>
+        </flux:tooltip>
+    </div>
+</div>
 
             <!-- Senha -->
             <div x-data="{
-                pwd: '',
+                pwd: '', pwdConfirm:'',
                 valid() {
                     return /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}/.test(this.pwd)
                 }
-            }" class="relative w-full max-w-lg mt-2">
-
-                <div class="relative w-full">
+            }" class="w-full max-w-lg">
+                <div class="relative">
                     <flux:input
                         id="password"
                         x-model="pwd"
@@ -81,10 +82,9 @@
                         autocomplete="new-password"
                         :placeholder="__('Digite sua senha aqui...')"
                         viewable
-                        class="mt-2"
                     />
 
-                    <div class="absolute top-1 left-10 flex items-center pointer-events-auto">
+                    <div class="absolute -top-4 left-10 flex items-center pointer-events-auto">
                         <flux:tooltip toggleable placement="top">
                             <flux:button
                                 icon="information-circle"
@@ -95,56 +95,75 @@
                                 aria-controls="password-help"
                                 aria-expanded="false"
                             />
-                            <flux:tooltip.content id="password-help" class="max-w-[10rem] space-y-2">
+                            <flux:tooltip.content id="password-help" class="max-w-[16rem] space-y-2">
                                 <p>A senha deve conter:</p>
                                 <ul class="list-disc list-inside text-sm">
-                                    <li>8 caracteres</li>
-                                    <li>1 letra maiúscula e 1 minúscula</li>
-                                    <li>1 número</li>
-                                    <li>1 caractere especial</li>
+                                    <li>Mínimo de 8 caracteres</li>
+                                    <li>Pelo menos 1 letra maiúscula</li>
+                                    <li>Pelo menos 1 letra minúscula</li>
+                                    <li>Pelo menos 1 número</li>
+                                    <li>Pelo menos 1 caractere especial</li>
                                 </ul>
                             </flux:tooltip.content>
                         </flux:tooltip>
                     </div>
                 </div>
 
-                <div class="text-sm mt-1" :class="valid() ? 'text-green-600' : 'text-red-600'">
-                    <template x-if="valid()">Senha válida</template>
-                    <template x-if="!valid()">Mín. 8, 1 minúscula, 1 maiúscula, 1 número e 1 símbolo</template>
+                <div class="mt-2 text-sm" x-show="pwd.length > 0" :class="valid() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                    <template x-if="valid()">
+                        <span>Senha forte</span>
+                    </template>
+                    <template x-if="!valid() && pwd.length > 0">
+                        <span>A senha não atende aos requisitos</span>
+                    </template>
                 </div>
             </div>
 
             <!-- Confirmar Senha -->
-            <flux:input
-                name="password_confirmation"
-                :label="__('Confirmar Senha*')"
-                type="password"
-                required
-                autocomplete="new-password"
-                :placeholder="__('Confirmar senha*')"
-                viewable
-                class="mt-2"
-            />
+            <div class="w-full max-w-lg">
+                <flux:input
+                    name="password_confirmation"
+                    :label="__('Confirmar Senha*')"
+                    type="password"
+                    required
+                    x-model="pwdConfirm"
+                    autocomplete="new-password"
+                    :placeholder="__('Confirmar senha*')"
+                    viewable
+                />
+            </div>
+               
+            <!-- Confirmação de Senha no front -->
 
+            <div class="text-sm mt-1" x-show="pwdConfirm.length > 0" :class="pwd === pwdConfirm ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                <template x-if="pwd === pwdConfirm">
+                    <span>As senhas coincidem </span>
+                </template>
+                <template x-if="pwd !== pwdConfirm && pwdConfirm.length > 0">
+                    <span>As senhas não coincidem </span>
+                </template  >
+
+            </div>
             <!-- Termos de Uso -->
-            <!-- Termos de Uso -->
-<flux:field variant="inline">
-    <flux:checkbox wire:model="terms" />
-    <flux:label>
-        <a 
-            href="#"
-            class="bg-transparent border-none p-0 m-0 text-sm font-medium 
-                   text-gray-800 dark:text-white 
-                   hover:underline focus:outline-none"
-            aria-haspopup="dialog" 
-            aria-expanded="false" 
-            aria-controls="hs-scroll-inside-body-modal" 
-            data-hs-overlay="#hs-scroll-inside-body-modal">
-            Eu li e concordo com os Termos de Uso (Obrigatório)*
-        </a>
-    </flux:label>
-    <flux:error name="terms" />
-</flux:field>
+            <div class="w-full max-w-lg mt-2">
+                <flux:field variant="inline">
+                    <flux:checkbox wire:model="terms" />
+                    <flux:label>
+                        <a 
+                            href="#"
+                            class="bg-transparent border-none p-0 m-0 text-sm font-medium 
+                                   text-gray-800 dark:text-white 
+                                   hover:underline focus:outline-none"
+                            aria-haspopup="dialog" 
+                            aria-expanded="false" 
+                            aria-controls="hs-scroll-inside-body-modal" 
+                            data-hs-overlay="#hs-scroll-inside-body-modal">
+                            Eu li e concordo com os Termos de Uso (Obrigatório)*
+                        </a>
+                    </flux:label>
+                    <flux:error name="terms" />
+                </flux:field>
+            </div>
 
             <!-- Modal de Termos de Uso -->
             <div id="hs-scroll-inside-body-modal" 
@@ -182,8 +201,8 @@
                         <div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t border-gray-200 dark:border-neutral-700">
                             <button type="button" 
                                     class="py-2 px-3 text-sm font-medium rounded-lg 
-               border border-gray-200 bg-yellow-400 text-gray-800 
-               hover:bg-yellow-300 
+               border border-gray-200 bg-accent text-white 
+               cursor-pointer 
                dark:border-neutral-700 dark:text-gray-900" 
                                     data-hs-overlay="#hs-scroll-inside-body-modal">
                                 Fechar
@@ -194,7 +213,7 @@
             </div>
 
             <!-- Botão de Cadastro -->
-            <div class="flex items-center justify-end mt-4">
+            <div class="flex items-center justify-end mt-2 w-full max-w-lg">
                 <flux:button wire:click="save" type="submit" variant="primary" class="w-full cursor-pointer" data-test="register-user-button">
                     {{ __('Cadastrar') }}
                 </flux:button>
