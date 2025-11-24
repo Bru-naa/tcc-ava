@@ -18,7 +18,9 @@ class DatabaseSeeder extends Seeder
             RegionalSeeder::class,
             EscolaSeeder::class,
              RoleSeeder::class,
+             CursoSeeder::class,
             UserSeeder::class,
+            AvaliacaoSeeder::class,
            
         ]);
 

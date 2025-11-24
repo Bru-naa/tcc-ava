@@ -24,6 +24,7 @@ return new class extends Migration
 
             $table->enum('status_ativacao', ['ativo', 'pendente'])->default('pendente');
             $table->foreignId('escola_id')->nullable()->constrained('escolas')->nullOnDelete();
+             $table->foreignId('pre_registro_id')->nullable()->constrained()->onDelete('cascade');
            
            
             $table->timestamp('email_verified_at')->nullable();

@@ -13,8 +13,16 @@ return new class extends Migration
     {
         Schema::create('matriculas', function (Blueprint $table) {
               $table->id();
+            
+              $table->string('codigo_matricula')->unique();
             $table->foreignId('aluno_id')->constrained('alunos')->onDelete('cascade');
-            $table->foreignId('turma_id')->constrained('turmas')->onDelete('cascade');
+           
+            $table->foreignId('curso_id')->constrained('cursos')->onDelete('cascade');
+
+            $table->foreignId('turma_id')
+      ->nullable()
+      ->constrained('turmas')
+      ->onDelete('cascade');
               
             $table->date('data_matricula');
             $table->enum('status', ['ativa', 'trancada', 'concluida', 'transferido'])->default('ativa');

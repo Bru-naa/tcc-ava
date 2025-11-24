@@ -58,10 +58,11 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Escola::class);
     }
+     public function preRegistro()
+    {
+        return $this->belongsTo(PreRegistro::class);
+    }
 
    
-    public function preRegistro()
-    {
-        return $this->hasOne(PreRegistro::class, 'email_institucional', 'email');
-    }
+   
 }

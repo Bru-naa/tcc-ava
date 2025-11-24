@@ -18,7 +18,7 @@ return new class extends Migration
             
             $table->string('email_institucional')->unique();
             $table->string('criado_por')->nullable();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+           
             
             $table->foreignId('escola_id')->constrained()->onDelete('cascade');
             $table->foreignId('role_id')->constrained()->onDelete('cascade');

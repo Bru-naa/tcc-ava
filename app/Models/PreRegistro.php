@@ -24,8 +24,8 @@ class PreRegistro extends Model
         return $this->belongsTo(Escola::class);
     }
 
-    public function user()
+      public function user()
     {
-        return $this->hasOne(User::class, 'email', 'email_institucional');
+        return $this->hasOne(User::class);
     }
 }
