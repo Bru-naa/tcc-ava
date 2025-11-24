@@ -13,11 +13,16 @@ return new class extends Migration
     {
         Schema::create('cursos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('escola_id')->constrained('escolas')->onDelete('cascade');
+           $table->foreignId('escola_id')
+    ->constrained('escolas')
+    ->onDelete('cascade');
             $table->string('nome_curso');
             $table->text('descricao_curso')->nullable();
             $table->integer('duracao_curso'); // duração em meses
             $table->string('nivel_curso');
+            $table->string('sigla');
+            $table->integer('ultimo_numero')->default(0);
+            $table->string('area_curso');
             $table->boolean('ativo')->default(true);
 
             $table->timestamps();

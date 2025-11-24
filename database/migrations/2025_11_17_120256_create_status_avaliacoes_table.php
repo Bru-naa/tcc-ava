@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('status_avaliacoes', function (Blueprint $table) {
             $table->id();
+            $table->boolean('aberta')->default(false);
+            $table->string('aberto_por');
+            $table->string('fechado_por')->nullable();
+            $table->date('data_abertura')->nullable();
+            $table->date('data_fechamento')->nullable();
+            $table->string('observacoes')->nullable();
+            $table->string('periodo')->unique();
             $table->timestamps();
         });
     }

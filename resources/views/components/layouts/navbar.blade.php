@@ -8,9 +8,8 @@
     @fluxAppearance
     @livewireStyles
 </head>
-<body>
-    <header>
        <body class="min-h-screen bg-white dark:bg-zinc-800 antialiased">
+     
     <flux:header container class="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700">
         <flux:sidebar.toggle class="lg:hidden" icon="bars-2" />
             <flux:brand href="#" logo="{{ asset('images/logo-ava.png') }}" name="AvaliaEdu" class="max-lg:hidden dark:hidden" />
@@ -18,9 +17,10 @@
 
             <flux:navbar class="-mb-px max-lg:hidden">
                 <flux:navbar.item icon="home" href="#home" current>Home</flux:navbar.item>
-                <flux:navbar.item icon="information-circle" href="#sobreNos">Sobre nós</flux:navbar.item>
+                
                 <!-- <flux:navbar.item icon="information-circle" badge="12" href="#">Sobre nós</flux:navbar.item> -->
                  <flux:navbar.item icon="building-library" href="#instituicoes">Instituições</flux:navbar.item>
+                 <flux:navbar.item icon="information-circle" href="#sobreNos">Sobre nós</flux:navbar.item>
                 <flux:navbar.item icon="at-symbol" href="#contato">Contato</flux:navbar.item>
                 
                 <flux:separator vertical variant="subtle" class="my-2"/>
@@ -70,10 +70,16 @@
                                 {{ __('Log Out') }}
                             </flux:menu.item>
                         </form>
+                           <flux:menu.separator />
+
+                        <flux:menu.item href="{{ route('profile.edit') }}" icon="briefcase" class="w-full" data-test="profile-button">
+                            {{ __('Perfil') }}
+                        </flux:menu.item>
                     @else
                         <flux:menu.item href="{{ route('login') }}" icon="arrow-right-end-on-rectangle" class="w-full" data-test="login-button">
                             {{ __('Log In') }}
                         </flux:menu.item>
+
                     @endauth
                 </flux:menu>
             </flux:dropdown>
@@ -92,8 +98,8 @@
 
             <flux:sidebar.nav>
                 <flux:sidebar.item icon="home" href="#home" current>Home</flux:sidebar.item>
-                <flux:sidebar.item icon="information-circle" href="#sobreNos">Sobre nós</flux:sidebar.item>
                  <flux:sidebar.item icon="building-library" href="#instituicoes">Instituições</flux:sidebar.item>
+                 <flux:sidebar.item icon="information-circle" href="#sobreNos">Sobre nós</flux:sidebar.item>
                 <flux:sidebar.item icon="at-symbol" href="#contato">Contato</flux:sidebar.item>
                
                 
@@ -125,14 +131,10 @@
 <!-- 
                 <flux:separator class="md:hidden" />
 
-                <div class="flex-1 max-md:pt-6 self-stretch">
-                    <flux:heading size="xl" level="1">Good afternoon, Olivia</flux:heading>
-                    <flux:text class="mb-6 mt-2 text-base">Here's what's new today</flux:text>
-                    <flux:separator variant="subtle" />
-                </div>
+               
             </div> -->
         </flux:main>
-    </header>
+ 
       <!-- VLibras -->
     <div vw class="enabled">
       <div vw-access-button class="active"></div>

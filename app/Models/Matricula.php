@@ -13,18 +13,39 @@ class Matricula extends Model
         'aluno_id',
         'turma_id',
         'data_matricula',
-        'status'
+        'status',
+        'codigo_matricula'
+        
     ];
-    public function aluno(){
+       protected $casts = [
+        'data_matricula' => 'date'
+    ];
+
+    public function aluno(): BelongsTo
+    {
         return $this->belongsTo(Aluno::class);
     }
 
-    public function turma(){
-        return $this->belongsTo(Turma::class);
+    public function curso(): BelongsTo
+    {
+        return $this->belongsTo(Curso::class);
     }
-    public function reclamacoes()
-{
-    return $this->hasMany(Reclamacao::class);
-}
+
+    // Scopes úteis
+    public function scopeAtivo($query)
+    {
+        return $query->where('status', 'ativo');
+    }
+
+    public function scopeInativo($query)
+    {
+        return $query->where('status', 'inativo');
+    }
+
+    public function scopeConcluido($query)
+    {
+        return $query->where('status', 'concluido');
+    }
+
 
 }

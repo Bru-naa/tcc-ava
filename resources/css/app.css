@@ -13,10 +13,20 @@
 
 /* Preline UI (apenas o CSS) */
 @import "../../node_modules/preline/variants.css";
+@import '../../vendor/power-components/livewire-powergrid/resources/css/tailwind4.css';
+
+@source '../../app/Livewire/*Table.php';
+@source '../../app/Livewire/**/*Table.php';
+@source '../../vendor/power-components/livewire-powergrid/src/Themes/Tailwind.php';
+@source '../../vendor/power-components/livewire-powergrid/resources/views/**/*.php';
+
 
 /* Custom dark variant for Flux components */
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+
+
 
 /* Re-assign Flux's gray of choice... */
 @theme {
@@ -31,6 +41,18 @@
     --color-zinc-800: var(--color-gray-800);
     --color-zinc-900: var(--color-gray-900);
     --color-zinc-950: var(--color-gray-950);
+     --color-pg-primary-50: oklch(0.985 0 0);
+ --color-pg-primary-100: oklch(0.97 0 0);
+ --color-pg-primary-200: oklch(0.922 0 0);
+ --color-pg-primary-300: oklch(0.87 0 0);
+ --color-pg-primary-400: oklch(0.708 0 0);
+ --color-pg-primary-500: oklch(0.556 0 0);
+ --color-pg-primary-600: oklch(0.439 0 0);
+ --color-pg-primary-700: oklch(0.371 0 0);
+ --color-pg-primary-800: oklch(0.269 0 0);
+ --color-pg-primary-900: oklch(0.205 0 0);
+ --color-pg-primary-950: oklch(0.145 0 0);
+    
 }
 @theme {
     --color-accent: var(--color-cyan-600);
@@ -65,7 +87,7 @@
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
-    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+   
 }
 
 /* \[:where(&)\]:size-4 {

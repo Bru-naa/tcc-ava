@@ -4,18 +4,36 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\ContatoController;
+
 use App\Http\Controllers\UserImportController; 
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PreCadastroController;
+
 use App\Models\Role;
-use App\Models\Escola;
+
+use App\Http\Controllers\PreCadastroController;
+use App\Http\Controllers\AlunoController;
+use App\Http\Controllers\AvaliacaoController;
+
+use App\Http\Controllers\SecretariaController;
+use App\Http\Controllers\CursoController;
+
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('landing-page');
 })->name('landing');
 
+Route::fallback(function () {
+    if (!auth()->check()) {
+        return redirect()->route('landing');
+    }
+    abort(404);
+});
 Route::post('/contato/enviar', [ContatoController::class, 'enviar'])->name('contato.enviar');
+
+Route::post('/avaliacoes/gerenciar', [AvaliacaoController::class, 'gerenciarStatus'])
+     ->name('avaliacoes.gerenciar')
+     ->middleware('auth');
 
 // Rotas da Secretaria
 Route::middleware(['auth', 'verified', 'role:secretaria']) 
@@ -27,16 +45,18 @@ Route::middleware(['auth', 'verified', 'role:secretaria'])
             $escolas = in_array(Auth::user()->role->acesso, ['secretaria', 'direcao'])
                         ? collect([Auth::user()->escola])
                         : Escola::all();
+            $cursos = \App\Models\Curso::where('ativo', true)->get(); 
 
-            return view('perfis.secretaria.sec-home', compact('roles', 'escolas'));
+            return view('perfis.secretaria.sec-home', compact('roles', 'escolas', 'cursos'));
         })->name('home');
        
-        Route::get('/pre-cadastro', [PreCadastroController::class, 'create'])->name('pre-cadastro.create');
+        Route::post('/cursos', [CursoController::class, 'store'])->name('cursos.store');
         Route::post('/pre-cadastro', [PreCadastroController::class, 'store'])->name('pre-cadastro.store');
-
-        /* Route::post('/importar-usuarios', [UserImportController::class, 'import'])
-            ->name('usuarios.import'); */
+        Route::post('/alunos', [AlunoController::class, 'store'])->name('alunos.store');
     });
+
+    Route::post('/avaliacoes/gerenciar', [AvaliacaoController::class, 'gerenciarStatus'])
+     ->name('avaliacoes.gerenciar');
 
 // Rotas para Admin
 Route::middleware(['auth', 'verified', 'role:admin']) 
@@ -54,7 +74,7 @@ Route::middleware(['auth', 'verified', 'role:professor'])
     ->name('professor.')
     ->group(function () {
         Route::get('/painel', function () {
-            return view('perfis.professor.painel');
+            return view('perfis.professor.professor-home');
         })->name('painel');
     });
 
