@@ -21,15 +21,9 @@ final class AlunoTable extends PowerGridComponent
         $this->showCheckBox();
 
         return [
-            PowerGrid::header()
-                ->showSearchInput(),
-                
-            PowerGrid::footer()
-                ->showPerPage()
-                ->showRecordCount(),
-
-            PowerGrid::responsive()
-                ->fixedColumns('id', 'alun_nome', 'matricula', 'actions'),
+            PowerGrid::header()->showSearchInput(),
+            PowerGrid::footer()->showPerPage()->showRecordCount(),
+            PowerGrid::responsive()->fixedColumns('id', 'alun_nome', 'matricula', 'actions'),
         ];
     }
 
@@ -51,14 +45,18 @@ final class AlunoTable extends PowerGridComponent
             ->add('id')
             ->add('alun_nome')
             ->add('alun_email')
-            ->add('alun_data_nascimento_formatted', fn (Aluno $model) => Carbon::parse($model->alun_data_nascimento)->format('d/m/Y'))
+            ->add('alun_data_nascimento_formatted', fn (Aluno $model) =>
+                Carbon::parse($model->alun_data_nascimento)->format('d/m/Y')
+            )
             ->add('alun_telefone')
             ->add('alun_cpf')
             ->add('alun_endereco')
             ->add('alun_sexo')
             ->add('status')
-            ->add('matricula', fn (Aluno $model) => 
-                $model->matriculas->first() ? $model->matriculas->first()->codigo_matricula : 'Sem matrícula'
+            ->add('matricula', fn (Aluno $model) =>
+                $model->matriculas->first()
+                    ? $model->matriculas->first()->codigo_matricula
+                    : 'Sem matrícula'
             );
     }
 
@@ -66,46 +64,39 @@ final class AlunoTable extends PowerGridComponent
     {
         return [
             Column::make('Id', 'id'),
-            
+
             Column::make('Matrícula', 'matricula')
-                ->sortable()
-                ->searchable(),
+                ->sortable(),
 
             Column::make('Nome', 'alun_nome')
-                ->sortable()
-                ->searchable(),
+                ->sortable(),
 
             Column::make('Email', 'alun_email')
-                ->sortable()
-                ->searchable(),
+                ->sortable(),
 
             Column::make('Data de nascimento', 'alun_data_nascimento_formatted', 'alun_data_nascimento')
                 ->sortable(),
 
             Column::make('Telefone', 'alun_telefone')
-                ->sortable()
-                ->searchable(),
+                ->sortable(),
 
             Column::make('CPF', 'alun_cpf')
-                ->sortable()
-                ->searchable(),
+                ->sortable(),
 
             Column::make('Endereço', 'alun_endereco')
                 ->sortable()
                 ->searchable(),
 
             Column::make('Sexo', 'alun_sexo')
-                ->sortable()
-                ->searchable(),
+                ->sortable(),
 
             Column::make('Status', 'status')
-                ->sortable()
-                ->searchable(),
+                ->sortable(),
 
             Column::make('Criado em', 'created_at')
                 ->sortable(),
 
-            Column::action('Ações')
+            Column::action('Ações'),
         ];
     }
 
@@ -126,18 +117,15 @@ final class AlunoTable extends PowerGridComponent
     public function delete($rowId): void
     {
         $aluno = Aluno::find($rowId);
-        
+
         if ($aluno) {
-            // Verifica se o aluno tem matrículas ativas antes de deletar
             if ($aluno->matriculas()->where('status', 'ativa')->exists()) {
                 $this->js("alert('Não é possível excluir este aluno pois ele possui matrículas ativas!')");
                 return;
             }
-            
+
             $aluno->delete();
             $this->js("alert('Aluno deletado com sucesso!')");
-            
-            // Atualiza a tabela após a exclusão
             $this->fillData();
         }
     }
@@ -150,7 +138,7 @@ final class AlunoTable extends PowerGridComponent
                 ->id()
                 ->class('pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700 dark:ring-offset-pg-primary-800 dark:text-pg-primary-300 dark:bg-pg-primary-700 mr-2')
                 ->dispatch('edit', ['rowId' => $row->id]),
-                
+
             Button::add('delete')
                 ->slot('Deletar')
                 ->id()
