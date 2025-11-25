@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\PreRegistro;
+use App\Models\PreCadastro;
 use livewire\WithFileUploads;
 use Maatwebsite\Excel\Facades;
 

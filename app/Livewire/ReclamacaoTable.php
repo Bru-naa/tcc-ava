@@ -2,9 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\PreCadastro;
-use App\Models\Roles;
-use App\Models\Escola;  
+use App\Models\Reclamacao;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use PowerComponents\LivewirePowerGrid\Button;
@@ -14,9 +12,9 @@ use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
 
-final class PreCadastroTable extends PowerGridComponent
+final class ReclamacaoTable extends PowerGridComponent
 {
-    public string $tableName = 'preCadastroTable';
+    public string $tableName = 'reclamacaoTable';
 
     public function setUp(): array
     {
@@ -33,7 +31,7 @@ final class PreCadastroTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return PreCadastro::query();
+        return Reclamacao::query();
     }
 
     public function relationSearch(): array
@@ -45,17 +43,15 @@ final class PreCadastroTable extends PowerGridComponent
     {
         return PowerGrid::fields()
             ->add('id')
-            ->add('nome')
-            ->add('telefone')
-            ->add('data_nascimento_formatted', fn (PreRegistro $model) => Carbon::parse($model->data_nascimento)->format('d/m/Y'))
-            ->add('cpf_masked',fn (PreRegistro $model) => '***.***.***-' . substr($model->cpf, -4))
-
-            ->add('email_pessoal')
-            ->add('email_institucional')
-            ->add('escola_id')
-            ->add('role_id')
-            ->add('criado_por')
+            ->add('assunto')
+            ->add('descricao')
             ->add('status')
+            ->add('data_reclamacao')
+            ->add('data_resolucao')
+            ->add('prioridade')
+            ->add('user_id')
+            ->add('matricula_id')
+            ->add('escola_id')
             ->add('created_at');
     }
 
@@ -63,32 +59,11 @@ final class PreCadastroTable extends PowerGridComponent
     {
         return [
             Column::make('Id', 'id'),
-            Column::make('Nome', 'nome')
+            Column::make('Assunto', 'assunto')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Telefone', 'telefone')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Data nascimento', 'data_nascimento_formatted', 'data_nascimento')
-                ->sortable(),
-
-            Column::make('CPF(últimos digitos)', 'cpf_masked')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Email pessoal', 'email_pessoal')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Email institucional', 'email_institucional')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Escola id', 'escola_id'),
-            Column::make('Role id', 'role_id'),
-            Column::make('Criado por', 'criado_por')
+            Column::make('Descricao', 'descricao')
                 ->sortable()
                 ->searchable(),
 
@@ -96,6 +71,27 @@ final class PreCadastroTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
+            Column::make('Data reclamacao', 'data_reclamacao_formatted', 'data_reclamacao')
+                ->sortable(),
+
+            Column::make('Data reclamacao', 'data_reclamacao')
+                ->sortable()
+                ->searchable(),
+
+            Column::make('Data resolucao', 'data_resolucao_formatted', 'data_resolucao')
+                ->sortable(),
+
+            Column::make('Data resolucao', 'data_resolucao')
+                ->sortable()
+                ->searchable(),
+
+            Column::make('Prioridade', 'prioridade')
+                ->sortable()
+                ->searchable(),
+
+            Column::make('User id', 'user_id'),
+            Column::make('Matricula id', 'matricula_id'),
+            Column::make('Escola id', 'escola_id'),
             Column::make('Created at', 'created_at_formatted', 'created_at')
                 ->sortable(),
 
@@ -110,7 +106,6 @@ final class PreCadastroTable extends PowerGridComponent
     public function filters(): array
     {
         return [
-            Filter::datepicker('data_nascimento'),
         ];
     }
 
@@ -120,7 +115,7 @@ final class PreCadastroTable extends PowerGridComponent
         $this->js('alert('.$rowId.')');
     }
 
-    public function actions(PreRegistro $row): array
+    public function actions(Reclamacao $row): array
     {
         return [
             Button::add('edit')
@@ -131,7 +126,7 @@ final class PreCadastroTable extends PowerGridComponent
         ];
     }
 
-    
+    /*
     public function actionRules($row): array
     {
        return [
@@ -141,5 +136,5 @@ final class PreCadastroTable extends PowerGridComponent
                 ->hide(),
         ];
     }
-   
+    */
 }

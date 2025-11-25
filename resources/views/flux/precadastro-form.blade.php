@@ -16,7 +16,7 @@
             <div>
                 <flux:heading size="lg">Pré-registro</flux:heading>
                 <flux:text class="mt-2">
-                    Insira as informações do funcionário para gerar o e-mail institucional.
+                    Insira as informações do servidor para gerar o e-mail institucional.
                 </flux:text>
             </div>
 
