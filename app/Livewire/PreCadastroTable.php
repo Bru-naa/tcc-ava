@@ -2,7 +2,9 @@
 
 namespace App\Livewire;
 
-use App\Models\PreRegistro;
+use App\Models\PreCadastro;
+use App\Models\Roles;
+use App\Models\Escola;  
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use PowerComponents\LivewirePowerGrid\Button;
@@ -31,7 +33,7 @@ final class PreCadastroTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return PreRegistro::query();
+        return PreCadastro::query();
     }
 
     public function relationSearch(): array

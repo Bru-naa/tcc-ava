@@ -4,19 +4,15 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\ContatoController;
-
 use App\Http\Controllers\UserImportController; 
 use App\Http\Controllers\UserController;
-
 use App\Models\Role;
-
+use App\Models\Escola;
 use App\Http\Controllers\PreCadastroController;
 use App\Http\Controllers\AlunoController;
 use App\Http\Controllers\AvaliacaoController;
-
 use App\Http\Controllers\SecretariaController;
 use App\Http\Controllers\CursoController;
-
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -29,13 +25,19 @@ Route::fallback(function () {
     }
     abort(404);
 });
+
 Route::post('/contato/enviar', [ContatoController::class, 'enviar'])->name('contato.enviar');
+
+Route::post('/register/check-email', function (Illuminate\Http\Request $request) {
+    $preCadastrado = \App\Models\PreCadastro::where('email_institucional', $request->email)->exists();
+    
+    return response()->json(['pre_cadastrado' => $preCadastrado]);
+})->name('register.check-email');
 
 Route::post('/avaliacoes/gerenciar', [AvaliacaoController::class, 'gerenciarStatus'])
      ->name('avaliacoes.gerenciar')
      ->middleware('auth');
 
-// Rotas da Secretaria
 Route::middleware(['auth', 'verified', 'role:secretaria']) 
     ->prefix('secretaria')
     ->name('secretaria.')
@@ -55,20 +57,15 @@ Route::middleware(['auth', 'verified', 'role:secretaria'])
         Route::post('/alunos', [AlunoController::class, 'store'])->name('alunos.store');
     });
 
-    Route::post('/avaliacoes/gerenciar', [AvaliacaoController::class, 'gerenciarStatus'])
-     ->name('avaliacoes.gerenciar');
-
-// Rotas para Admin
 Route::middleware(['auth', 'verified', 'role:admin']) 
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', function () {
-            return view('perfis.admin.dashboard');
+            return view('perfis.admin.admin-home');
         })->name('dashboard');
     });
 
-// Rotas para Professor  
 Route::middleware(['auth', 'verified', 'role:professor']) 
     ->prefix('professor')
     ->name('professor.')
@@ -78,27 +75,24 @@ Route::middleware(['auth', 'verified', 'role:professor'])
         })->name('painel');
     });
 
-// Rotas para Coordenação
 Route::middleware(['auth', 'verified', 'role:coordenador']) 
     ->prefix('coordenacao')
     ->name('coordenacao.')
     ->group(function () {
         Route::get('/painel', function () {
-            return view('perfis.coordenacao.painel');
+            return view('perfis.coordenadacao.coodernador-home');
         })->name('painel');
     });
 
-// Rotas para Direção
 Route::middleware(['auth', 'verified', 'role:direcao']) 
     ->prefix('direcao')
     ->name('direcao.')
     ->group(function () {
         Route::get('/painel', function () {
-            return view('perfis.direcao.painel');
+            return view('perfis.direcao.direcao-home');
         })->name('painel');
     });
 
-// CONFIGURAÇÕES
 Route::middleware(['auth'])->group(function () {
     Route::get('settings', function() {
         return redirect()->route('profile.edit');

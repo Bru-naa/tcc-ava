@@ -23,46 +23,123 @@
                 />
             </div>
 
-            <!-- Email -->
-           <div class="relative w-full max-w-lg" x-data="{ email: '' }">
-    <flux:input
-        name="email"
-        x-model="email"
-        :label="__('Email educacional:')"
-        type="email"
-        required
-        autocomplete="email"
-        placeholder="email@example.com"
-        class="pr-10"
-        id="email"
-        aria-describedby="email-help"
-        pattern="^[a-zA-Z0-9._%+-]+@(secretaria\.gov\.br|professor\.gov\.br|coordenador\.gov\.br)$"
-    />
+            <!-- Email com verificação de pré-cadastro -->
+            <div class="relative w-full max-w-lg" 
+                 x-data="{
+                     email: '',
+                     isPreCadastrado: false,
+                     isLoading: false,
+                     
+                     async checkPreCadastro() {
+                         if (!this.email) {
+                             this.isPreCadastrado = false;
+                             return;
+                         }
 
-    <!-- Ícone e Tooltip -->
-    <div class="absolute top-9 right-2 flex items-center pointer-events-auto">
-        <flux:tooltip toggleable placement="top">
-            <flux:button
-                icon="information-circle"
-                size="sm"
-                variant="ghost"
-                class="p-0"
-                aria-label="Informação sobre e-mail"
-                aria-controls="email-help"
-            />
-            <flux:tooltip.content id="email-help" class="max-w-[20rem] space-y-2">
-                <p>Os domínios permitidos são:</p>
-                <ul class="list-disc list-inside text-sm">
-                    <li>@secretaria.gov.br</li>
-                    <li>@professor.gov.br</li>
-                    <li>@coordenador.gov.br</li>
-                    <li>Utilize o email educacional enviado para você</li>
-                    <li><strong>Precisa de ajuda? Contate o suporte</strong></li>
-                </ul>
-            </flux:tooltip.content>
-        </flux:tooltip>
-    </div>
-</div>
+                         // Valida formato primeiro
+                         const pattern = /^[a-zA-Z0-9._%+-]+@(secretaria\.gov\.br|professor\.gov\.br|coordenador\.gov\.br)$/;
+                         if (!pattern.test(this.email)) {
+                             this.isPreCadastrado = false;
+                             return;
+                         }
+
+                         this.isLoading = true;
+
+                         try {
+                             const response = await fetch('{{ route('register.check-email') }}', {
+                                 method: 'POST',
+                                 headers: {
+                                     'Content-Type': 'application/json',
+                                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                 },
+                                 body: JSON.stringify({ email: this.email })
+                             });
+
+                             const data = await response.json();
+                             this.isPreCadastrado = data.pre_cadastrado;
+                             
+                         } catch (error) {
+                             this.isPreCadastrado = false;
+                         } finally {
+                             this.isLoading = false;
+                         }
+                     }
+                 }" 
+                 x-init="() => { $watch('email', value => checkPreCadastro()) }">
+
+                <flux:input
+                    name="email"
+                    x-model="email"
+                    :label="__('Email Institucional:')"
+                    type="email"
+                    required
+                    autocomplete="email"
+                    placeholder="email@professor.gov.br"
+                    :class="{
+                        'pr-16 border-green-500 bg-green-50 dark:bg-green-900/20': isPreCadastrado,
+                        'pr-16 border-red-500 bg-red-50 dark:bg-red-900/20': !isPreCadastrado && email,
+                        'pr-10 border-gray-300': !email
+                    }"
+                    id="email"
+                    aria-describedby="email-help"
+                    pattern="^[a-zA-Z0-9._%+-]+@(secretaria\.gov\.br|professor\.gov\.br|coordenador\.gov\.br)$"
+                />
+
+                <!--  status pré-cadastro -->
+                <div class="absolute top-9 right-8 flex items-center" x-show="email && !isLoading">
+                    <template x-if="isPreCadastrado">
+                        <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </template>
+                    <template x-if="!isPreCadastrado && email">
+                        <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                    </template>
+                </div>
+
+               
+                <div class="absolute top-9 right-8 flex items-center" x-show="isLoading">
+                    <svg class="animate-spin h-5 w-5 text-orange-500" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+
+                <!-- tooltip -->
+                <div class="absolute top-9 right-2 flex items-center pointer-events-auto">
+                    <flux:tooltip toggleable placement="top">
+                        <flux:button
+                            icon="information-circle"
+                            size="sm"
+                            variant="ghost"
+                            class="p-0"
+                            aria-label="Informação sobre e-mail"
+                            aria-controls="email-help"
+                        />
+                        <flux:tooltip.content id="email-help" class="max-w-[20rem] space-y-2">
+                            <p>Os domínios permitidos são:</p>
+                            <ul class="list-disc list-inside text-sm">
+                                <li>@secretaria.gov.br</li>
+                                <li>@professor.gov.br</li>
+                                <li>@coordenador.gov.br</li>
+                                <li>Utilize o email educacional enviado para você</li>
+                                <li><strong>Precisa de ajuda? Contate o suporte</strong></li>
+                            </ul>
+                        </flux:tooltip.content>
+                    </flux:tooltip>
+                </div>
+                
+                <div class="mt-2 text-sm" x-show="email">
+                    <template x-if="isPreCadastrado">
+                        <span class="text-green-600 dark:text-green-400">✅ Email pré-cadastrado. Complete seu cadastro criando uma senha.</span>
+                    </template>
+                    <template x-if="!isPreCadastrado && email">
+                        <span class="text-red-600 dark:text-red-400">❌ Email não encontrado no pré-cadastro. Entre em contato com a secretaria.</span>
+                    </template>
+                </div>
+            </div>
 
             <!-- Senha -->
             <div x-data="{
@@ -134,16 +211,15 @@
             </div>
                
             <!-- Confirmação de Senha no front -->
-
             <div class="text-sm mt-1" x-show="pwdConfirm.length > 0" :class="pwd === pwdConfirm ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
                 <template x-if="pwd === pwdConfirm">
                     <span>As senhas coincidem </span>
                 </template>
                 <template x-if="pwd !== pwdConfirm && pwdConfirm.length > 0">
                     <span>As senhas não coincidem </span>
-                </template  >
-
+                </template>
             </div>
+
             <!-- Termos de Uso -->
             <div class="w-full max-w-lg mt-2">
                 <flux:field variant="inline">
@@ -214,7 +290,7 @@
 
             <!-- Botão de Cadastro -->
             <div class="flex items-center justify-end mt-2 w-full max-w-lg">
-                <flux:button wire:click="save" type="submit" variant="primary" class="w-full cursor-pointer" data-test="register-user-button">
+                <flux:button type="submit" variant="primary" class="w-full cursor-pointer" data-test="register-user-button">
                     {{ __('Cadastrar') }}
                 </flux:button>
             </div>
