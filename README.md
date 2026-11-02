@@ -123,9 +123,11 @@ npm run dev
 
 ---
 
-## 🔑 Credenciais de Teste (Criadas pelo `UserSeeder`)
+## 🔑 Credenciais Fictícias de Teste (Exclusivas para Ambiente Local)
 
-Após rodar `php artisan migrate:fresh --seed`, você pode testar o login em **http://localhost:8000/login** com os seguintes usuários:
+> **⚠️ Aviso de Segurança:** Todas as credenciais, domínios e dados gerados pelo [`UserSeeder`](database/seeders/UserSeeder.php) são **estritamente fictícios e demonstrativos**, destinados apenas à execução local em ambiente de desenvolvimento/avaliação.
+
+Após rodar `php artisan migrate:fresh --seed`, você pode testar o login em **http://localhost:8000/login** com os seguintes usuários de demonstração:
 
 | Perfil | E-mail | Senha |
 | :--- | :--- | :--- |
@@ -134,6 +136,15 @@ Após rodar `php artisan migrate:fresh --seed`, você pode testar o login em **h
 | **Coordenação** | `teste@coordenador.gov.br` | `Coordenacao123#!` |
 | **Professor** | `teste@professor.gov.br` | `Professor123#!` |
 | **Admin** | `admin@avaliaedu.com` | `Admin123#!` |
+
+---
+
+## 👥 Equipe do Projeto (Concepção TCC `v1.0` & Refatoração `v2.0`)
+
+- **Beatriz:** Levantamento e documentação dos requisitos iniciais, desenvolvimento de telas front-end e modelagem do sistema.
+- **Bruna:** Desenvolvimento back-end, integração Laravel com chatbot, *code reviews*, gestão de tarefas e **Auditoria Arquitetural / Refatoração Técnica (`v2.0` — 01/11/2026)**.
+- **Laiane:** Design das telas no Figma (`v1.0`), definição do fluxo do chatbot via WhatsApp e execução de testes da aplicação.
+- **Luiz:** Desenvolvimento front-end, modelagem do banco de dados e organização das atividades no Kanban.
 
 ---
 
@@ -154,8 +165,25 @@ Após rodar `php artisan migrate:fresh --seed`, você pode testar o login em **h
 
 ---
 
-## 📄 Documentação de Requisitos
+## 📄 Documentação de Requisitos e Evolução Técnica
 
-O documento consolidado de requisitos e arquitetura do MVP encontra-se na raiz do projeto:
-- [`Documento_de_Requisitos_AVA_V02.pdf`](./Documento_de_Requisitos_AVA_V02.pdf)
+O documento consolidado de requisitos e melhorias do MVP encontra-se na raiz do projeto:
+- [`Documento_de_Requisitos_AVALIAEDU_V02.pdf`](./Documento_de_Requisitos_AVALIAEDU_V02.pdf)
+
+> [!NOTE]
+> ### 📌 Nota — Evolução Técnica e Ajustes (`v1.0` AS-IS → `v2.0` TO-BE)
+>
+> O projeto passou por ajustes em **16 pontos** para viabilizar o funcionamento ponta a ponta, mitigar gargalos de banco de dados e adequar o código aos padrões do Laravel 12 e Livewire 3:
+>
+> | Dimensão | Como Era (`AS-IS` — `v1.0`) | Como Ficou (`TO-BE` — `v2.0`) |
+> | :--- | :--- | :--- |
+> | **1. Primeiro Acesso (Fortify)** | Referência a Model/tabela inexistente (`PreRegistro`), variável não consultada no banco e regex bloqueando 3 perfis. | Unificação no Model `PreCadastro`, transação com `lockForUpdate()` e validação aceitando os 5 domínios institucionais. |
+> | **2. Geração de Matrículas** | `save()` repetido dentro de loop `do...while` sem transação (sujeito a *Race Condition*). | Encapsulamento em `DB::transaction()` com bloqueio `lockForUpdate()` e escrita única ao final do cálculo. |
+> | **3. Consultas no Banco (N+1)** | Consultas `Role::where()` dentro de loops de importação, 3 `COUNT(*)` separados e dados carregados em memória. | Pré-carregamento via `pluck()`, consolidação em query única com `SUM(CASE WHEN...)` e agregação via `GROUP BY`. |
+> | **4. Isolamento por Escola** | `escola_id = 1` fixo na importação e tabelas PowerGrid listando registros de todas as escolas misturados. | Vínculo dinâmico com `Auth::user()->escola_id` e filtro `scopeDaEscola()` nas listagens e exclusões. |
+> | **5. Padrão PSR-4 e Livewire 3** | Colisão de classe PSR-4, namespaces do Livewire 2, `emitSelf` antigo e `sleep(3)` travando a requisição. | Alinhamento ao autoloader PSR-4, eventos `#[On]` / `$this->dispatch()` do Livewire 3 e remoção do `sleep(3)`. |
+> | **6. Portabilidade (`SQLite`/`MySQL`)** | Comando `SET FOREIGN_KEY_CHECKS=0` exclusivo do MySQL impedindo os seeders de rodarem em SQLite. | Uso de `Schema::disableForeignKeyConstraints()` compatível tanto com SQLite quanto com MySQL. |
+>
+> 📄 **Detalhamento completo dos 16 ajustes e requisitos:** [`Documento_de_Requisitos_AVALIAEDU_V02.pdf`](./Documento_de_Requisitos_AVALIAEDU_V02.pdf)
+
 
