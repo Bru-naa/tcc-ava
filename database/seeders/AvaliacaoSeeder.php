@@ -6,17 +6,16 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\StatusAvaliacao;
 use App\Models\PerguntasAvaliacao;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class AvaliacaoSeeder extends Seeder
 {
     public function run()
     {
-       
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        Schema::disableForeignKeyConstraints();
         StatusAvaliacao::truncate();
         PerguntasAvaliacao::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        Schema::enableForeignKeyConstraints();
 
         // Períodos de 2025
         $periodos = [

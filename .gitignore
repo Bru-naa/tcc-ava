@@ -6,9 +6,19 @@
 /storage/pail
 /storage/debugbar
 /storage/framework/cache/*
+!/storage/framework/cache/data/
+/storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitignore
 /storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
 /storage/framework/views/*
+!/storage/framework/views/.gitignore
 /bootstrap/cache/*
+!/bootstrap/cache/.gitignore
+/database/*.sqlite
+/database/*.sqlite-journal
+/database/*.sqlite-wal
+/database/*.sqlite-shm
 
 # Node / Frontend
 /node_modules/
@@ -19,9 +29,8 @@
 public/storage
 
 # Ambientes
-.env
-.env.backup
-.env.production
+#.env.backup
+#.env.production
 
 # Logs
 *.log

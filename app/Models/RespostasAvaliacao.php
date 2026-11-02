@@ -1,58 +1,62 @@
 <?php
 
-
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class RespostasAvaliacao extends Model
 {
     protected $table = 'respostas_avaliacao';
-    
+
     protected $fillable = [
         'pergunta_id',
-        'periodo', 
+        'periodo',
         'resposta',
-        'session_id'
+        'session_id',
     ];
 
-    public function pergunta()
+    public function pergunta(): BelongsTo
     {
-        return $this->belongsTo(PerguntaAvaliacao::class, 'pergunta_id');
+        return $this->belongsTo(PerguntasAvaliacao::class, 'pergunta_id');
     }
 
-    public function scopePorPeriodo($query, $periodo)
+    public function scopePorPeriodo(Builder $query, string $periodo): Builder
     {
         return $query->where('periodo', $periodo);
     }
 
-    // BUSCAR DADOS PARA DASHBOARD
-    public static function getDadosDashboard($periodo)
+    // BUSCAR DADOS PARA DASHBOARD (Agregado via SQL GROUP BY)
+    public static function getDadosDashboard(string $periodo): array
     {
-        $respostas = self::with('pergunta')
+        $agrupados = self::query()
             ->porPeriodo($periodo)
-            ->get();
+            ->whereIn('pergunta_id', [1, 2, 3, 4])
+            ->select('pergunta_id', 'resposta', DB::raw('COUNT(*) as total'))
+            ->groupBy('pergunta_id', 'resposta')
+            ->get()
+            ->groupBy('pergunta_id');
 
         return [
-            // Pergunta 1 - Pizza/Barra
-            'participacao_atividades' => self::processarRespostas($respostas, 1),
-            
-            // Pergunta 2 - Barras Horizontais  
-            'dificuldades_ensino' => self::processarRespostas($respostas, 2),
-            
-            // Pergunta 3 - Pizza/Barra
-            'conforto_duvidas' => self::processarRespostas($respostas, 3),
-            
-            // Pergunta 4 - Barra Escala
-            'coerencia_avaliacoes' => self::processarRespostas($respostas, 4)
+            'participacao_atividades' => self::extrairContagem($agrupados, 1),
+            'dificuldades_ensino' => self::extrairContagem($agrupados, 2),
+            'conforto_duvidas' => self::extrairContagem($agrupados, 3),
+            'coerencia_avaliacoes' => self::extrairContagem($agrupados, 4),
         ];
     }
 
-    private static function processarRespostas($respostas, $perguntaId)
+    private static function extrairContagem(Collection $agrupados, int $perguntaId): array
     {
-        return $respostas->where('pergunta_id', $perguntaId)
-            ->groupBy('resposta')
-            ->map->count()
+        if (! $agrupados->has($perguntaId)) {
+            return [];
+        }
+
+        return $agrupados->get($perguntaId)
+            ->pluck('total', 'resposta')
+            ->map(fn ($total) => (int) $total)
             ->toArray();
     }
 }
