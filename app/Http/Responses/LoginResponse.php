@@ -2,26 +2,28 @@
 
 namespace App\Http\Responses;
 
+use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 
 class LoginResponse implements LoginResponseContract
 {
-    if ($user->hasRole('secretaria')) {
-    return redirect()->route('secretaria.home');
-}
+    public function toResponse($request)
+    {
+        $user = $request->user()?->loadMissing('role');
+        $acesso = $user?->role?->acesso;
 
-if ($user->hasRole('coordenador')) {
-    return redirect()->route('coordenacao.painel');
-}
-
-if ($user->hasRole('professor')) {
-    return redirect()->route('professor.painel');
-}
-
-if ($user->hasRole('direcao')) {
-    return redirect()->route('direcao.painel');
-}
-
-return redirect()->route('home');
-
+        return match ($acesso) {
+            'secretaria' => redirect()->route('secretaria.home'),
+            'direcao' => redirect()->route('direcao.painel'),
+            'coordenador' => redirect()->route('coordenacao.painel'),
+            'professor' => redirect()->route('professor.painel'),
+            'aluno' => Route::has('aluno.painel')
+                ? redirect()->route('aluno.painel')
+                : redirect()->route('landing'),
+            'admin' => Route::has('admin.dashboard')
+                ? redirect()->route('admin.dashboard')
+                : redirect()->route('landing'),
+            default => redirect()->route('landing'),
+        };
+    }
 }

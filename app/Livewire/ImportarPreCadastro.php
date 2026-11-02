@@ -2,48 +2,47 @@
 
 namespace App\Livewire;
 
+use App\Imports\UsersImport;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Session;
 
 class ImportarPreCadastro extends Component
 {
     use WithFileUploads;
 
-     public $permitirUpload = false; // desabilitado
+    public bool $permitirUpload = false;
+    public $arquivo;
+    public array $previewLinhas = [];
+    public int $totalLinhas = 0;
 
-    // Método para habilitar 
-    public function habilitarUpload()
+    public function habilitarUpload(): void
     {
         $this->permitirUpload = true;
     }
 
-    // Método para desabilitar 
-    public function desabilitarUpload()
+    public function desabilitarUpload(): void
     {
         $this->permitirUpload = false;
     }
-    
-    public $arquivo;
-    public $previewLinhas = [];
-    public $totalLinhas = 0;
 
-    public function updatedArquivo()
+    private function obterEscolaId(): int
     {
+        return (int) (Auth::user()?->escola_id ?? 1);
+    }
 
-        
+    public function updatedArquivo(): void
+    {
         $this->validate([
-            'arquivo' => 'required|file|mimes:xlsx,xls,csv|max:10240'
+            'arquivo' => 'required|file|mimes:xlsx,xls,csv|max:10240',
         ]);
 
         try {
-            // Fazer preview do arquivo
-            $data = Excel::toArray(new UsersImport(1), $this->arquivo); // escola_id 1 temporário
-            
-            if (!empty($data[0])) {
-                $this->previewLinhas = array_slice($data[0], 0, 5); // Primeiras 5 linhas
+            $data = Excel::toArray(new UsersImport($this->obterEscolaId()), $this->arquivo);
+
+            if (! empty($data[0])) {
+                $this->previewLinhas = array_slice($data[0], 0, 5);
                 $this->totalLinhas = count($data[0]);
             }
         } catch (\Exception $e) {
@@ -51,25 +50,23 @@ class ImportarPreCadastro extends Component
         }
     }
 
-    public function importar()
+    public function importar(): void
     {
         $this->validate([
-            'arquivo' => 'required|file|mimes:xlsx,xls,csv|max:10240'
+            'arquivo' => 'required|file|mimes:xlsx,xls,csv|max:10240',
         ]);
 
         try {
-            // Importar para pre_registro
-            Excel::import(new UsersImport(1), $this->arquivo); // escola_id 1 temporário
-            
+            Excel::import(new UsersImport($this->obterEscolaId()), $this->arquivo);
+
             session()->flash('success', 'Importação realizada com sucesso!');
             $this->reset(['arquivo', 'previewLinhas', 'totalLinhas']);
-            
         } catch (\Exception $e) {
             session()->flash('error', 'Erro na importação: ' . $e->getMessage());
         }
     }
 
-    public function cancelar()
+    public function cancelar(): void
     {
         $this->reset(['arquivo', 'previewLinhas', 'totalLinhas']);
     }

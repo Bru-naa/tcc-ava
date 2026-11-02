@@ -2,41 +2,39 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PerguntasAvaliacao extends Model
 {
- 
     protected $table = 'perguntas_avaliacao';
-    
+
     protected $fillable = [
         'pergunta',
         'tipo',
         'opcoes',
-        'ordem', 
-        'ativo'
+        'ordem',
+        'ativo',
     ];
 
     protected $casts = [
         'opcoes' => 'array',
-        'ativo' => 'boolean'
+        'ativo' => 'boolean',
     ];
 
-    // Scope para perguntas ativas
-    public function scopeAtivas($query)
+    public function scopeAtivas(Builder $query): Builder
     {
         return $query->where('ativo', true);
     }
 
-    // Ordenar por ordem
-    public function scopeOrdenadas($query)
+    public function scopeOrdenadas(Builder $query): Builder
     {
         return $query->orderBy('ordem');
     }
 
-    // Relacionamento com respostas
-    public function respostas()
+    public function respostas(): HasMany
     {
-        return $this->hasMany(RespostaAvaliacao::class, 'pergunta_id');
+        return $this->hasMany(RespostasAvaliacao::class, 'pergunta_id');
     }
 }

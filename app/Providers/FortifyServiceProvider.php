@@ -4,45 +4,20 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Http\Responses\LoginResponse as CustomLoginResponse;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Contracts\LoginResponse;
+use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->instance(LoginResponse::class, new class implements LoginResponse {
-            public function toResponse($request)
-            {
-                $user = $request->user();
-                
-                $user->load('role');
-                
-                if ($user->role) {
-                    $roleAcesso = $user->role->acesso;
-                    
-                    switch ($roleAcesso) {
-                        case 'secretaria':
-                            return redirect()->route('secretaria.home');
-                        case 'admin':
-                            return redirect()->route('admin.admin.dashboard');
-                        case 'professor':
-                            return redirect()->route('professor.painel');
-                        case 'coordenador':
-                            return redirect()->route('coordenacao.painel');
-                        case 'direcao':
-                            return redirect()->route('direcao.painel');
-                    }
-                }
-                
-                return redirect('/');
-            }
-        });
+        $this->app->singleton(LoginResponse::class, CustomLoginResponse::class);
     }
 
     public function boot(): void

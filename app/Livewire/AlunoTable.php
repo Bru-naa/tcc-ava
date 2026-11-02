@@ -3,14 +3,15 @@
 namespace App\Livewire;
 
 use App\Models\Aluno;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
-use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
+use PowerComponents\LivewirePowerGrid\PowerGridFields;
 
 final class AlunoTable extends PowerGridComponent
 {
@@ -29,9 +30,13 @@ final class AlunoTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Aluno::query()->with(['matriculas' => function($query) {
-            $query->where('status', 'ativa');
-        }]);
+        $escolaId = Auth::user()?->escola_id;
+
+        return Aluno::query()
+            ->with(['matriculaAtiva.curso'])
+            ->when($escolaId, function (Builder $query, int $id) {
+                $query->whereHas('matriculas.curso', fn (Builder $q) => $q->where('escola_id', $id));
+            });
     }
 
     public function relationSearch(): array
@@ -45,57 +50,32 @@ final class AlunoTable extends PowerGridComponent
             ->add('id')
             ->add('alun_nome')
             ->add('alun_email')
-            ->add('alun_data_nascimento_formatted', fn (Aluno $model) =>
-                Carbon::parse($model->alun_data_nascimento)->format('d/m/Y')
+            ->add('alun_data_nascimento_formatted', fn (Aluno $model) => $model->alun_data_nascimento
+                ? Carbon::parse($model->alun_data_nascimento)->format('d/m/Y')
+                : '-'
             )
             ->add('alun_telefone')
             ->add('alun_cpf')
             ->add('alun_endereco')
             ->add('alun_sexo')
             ->add('status')
-            ->add('matricula', fn (Aluno $model) =>
-                $model->matriculas->first()
-                    ? $model->matriculas->first()->codigo_matricula
-                    : 'Sem matrícula'
-            );
+            ->add('matricula', fn (Aluno $model) => $model->matriculaAtiva?->codigo_matricula ?? 'Sem matrícula');
     }
 
     public function columns(): array
     {
         return [
             Column::make('Id', 'id'),
-
-            Column::make('Matrícula', 'matricula')
-                ->sortable(),
-
-            Column::make('Nome', 'alun_nome')
-                ->sortable(),
-
-            Column::make('Email', 'alun_email')
-                ->sortable(),
-
-            Column::make('Data de nascimento', 'alun_data_nascimento_formatted', 'alun_data_nascimento')
-                ->sortable(),
-
-            Column::make('Telefone', 'alun_telefone')
-                ->sortable(),
-
-            Column::make('CPF', 'alun_cpf')
-                ->sortable(),
-
-            Column::make('Endereço', 'alun_endereco')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Sexo', 'alun_sexo')
-                ->sortable(),
-
-            Column::make('Status', 'status')
-                ->sortable(),
-
-            Column::make('Criado em', 'created_at')
-                ->sortable(),
-
+            Column::make('Matrícula', 'matricula')->sortable(),
+            Column::make('Nome', 'alun_nome')->sortable()->searchable(),
+            Column::make('Email', 'alun_email')->sortable()->searchable(),
+            Column::make('Data de nascimento', 'alun_data_nascimento_formatted', 'alun_data_nascimento')->sortable(),
+            Column::make('Telefone', 'alun_telefone')->sortable(),
+            Column::make('CPF', 'alun_cpf')->sortable(),
+            Column::make('Endereço', 'alun_endereco')->sortable()->searchable(),
+            Column::make('Sexo', 'alun_sexo')->sortable(),
+            Column::make('Status', 'status')->sortable(),
+            Column::make('Criado em', 'created_at')->sortable(),
             Column::action('Ações'),
         ];
     }
@@ -110,7 +90,7 @@ final class AlunoTable extends PowerGridComponent
     #[\Livewire\Attributes\On('edit')]
     public function edit($rowId): void
     {
-        $this->js('alert('.$rowId.')');
+        $this->js('alert(' . (int) $rowId . ')');
     }
 
     #[\Livewire\Attributes\On('delete')]
@@ -119,7 +99,7 @@ final class AlunoTable extends PowerGridComponent
         $aluno = Aluno::find($rowId);
 
         if ($aluno) {
-            if ($aluno->matriculas()->where('status', 'ativa')->exists()) {
+            if ($aluno->possuiVinculoAtivo()) {
                 $this->js("alert('Não é possível excluir este aluno pois ele possui matrículas ativas!')");
                 return;
             }
@@ -143,7 +123,7 @@ final class AlunoTable extends PowerGridComponent
                 ->slot('Deletar')
                 ->id()
                 ->class('pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700 dark:ring-offset-pg-primary-800 dark:text-pg-primary-300 dark:bg-pg-primary-700')
-                ->dispatch('delete', ['rowId' => $row->id])
+                ->dispatch('delete', ['rowId' => $row->id]),
         ];
     }
 }
