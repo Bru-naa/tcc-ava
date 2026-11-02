@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\StatusAvaliacao;
@@ -78,7 +78,7 @@ class AvaliacoesStatus extends Component
     public function render()
     {
         $statusAvaliacoes = StatusAvaliacao::latest()->get();
-        return view('livewire.status-avaliacoes', compact('statusAvaliacoes'));
+        return view('livewire.avaliacoes-status', compact('statusAvaliacoes'));
     }
 
     public function abrirAvaliacao()

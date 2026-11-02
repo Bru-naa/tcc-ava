@@ -70,7 +70,7 @@
     <div id="hs-basic-bordered-collapse-one" class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="hs-bordered-heading-one">
       <div class="pb-6 px-5">
      
-<liverwire:curso-edit-modal />
+<livewire:curso-edit-modal />
 <livewire:curso-table />
 
 

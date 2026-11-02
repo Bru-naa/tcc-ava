@@ -37,7 +37,7 @@
                          }
 
                          // Valida formato primeiro
-                         const pattern = /^[a-zA-Z0-9._%+-]+@(secretaria\.gov\.br|professor\.gov\.br|coordenador\.gov\.br)$/;
+                         const pattern = /^[a-zA-Z0-9._%+-]+@(aluno\.gov\.br|secretaria\.gov\.br|professor\.gov\.br|coordenacao\.gov\.br|coordenador\.gov\.br|direcao\.gov\.br)$/;
                          if (!pattern.test(this.email)) {
                              this.isPreCadastrado = false;
                              return;
@@ -75,14 +75,14 @@
                     required
                     autocomplete="email"
                     placeholder="email@professor.gov.br"
-                    :class="{
+                    x-bind:class="{
                         'pr-16 border-green-500 bg-green-50 dark:bg-green-900/20': isPreCadastrado,
                         'pr-16 border-red-500 bg-red-50 dark:bg-red-900/20': !isPreCadastrado && email,
                         'pr-10 border-gray-300': !email
                     }"
                     id="email"
                     aria-describedby="email-help"
-                    pattern="^[a-zA-Z0-9._%+-]+@(secretaria\.gov\.br|professor\.gov\.br|coordenador\.gov\.br)$"
+                    pattern="^[a-zA-Z0-9._%+-]+@(aluno\.gov\.br|secretaria\.gov\.br|professor\.gov\.br|coordenacao\.gov\.br|coordenador\.gov\.br|direcao\.gov\.br)$"
                 />
 
                 <!--  status pré-cadastro -->

@@ -1,33 +1,28 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Livewire;
 
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Toast extends Component
 {
-    public $show = false;
-    public $message = '';
-    public $type = 'success'; // success ou error
+    public bool $show = false;
+    public string $message = '';
+    public string $type = 'success';
 
-    protected $listeners = ['showToast'];
-
-    // Listener chamado via emit
-    public function showToast($type, $message)
+    #[On('showToast')]
+    public function showToast(string $type, string $message): void
     {
         $this->type = $type;
         $this->message = $message;
         $this->show = true;
 
-        // Desaparece sozinho depois de 3s
-        $this->dispatchBrowserEvent('toast-shown');
-
-        $this->emitSelf('hideToastAfterDelay');
+        $this->dispatch('toast-shown');
     }
 
-    public function hideToastAfterDelay()
+    public function hideToast(): void
     {
-        sleep(3); // espera 3s
         $this->show = false;
         $this->message = '';
     }
