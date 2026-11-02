@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Curso extends Model
 {
@@ -41,46 +44,57 @@ class Curso extends Model
         return $this->hasMany(Matricula::class);
     }
 
-    public function alunos()
+    public function turmas(): HasMany
     {
-        return $this->belongsToMany(Aluno::class, 'matriculas');
+        return $this->hasMany(Turma::class);
     }
 
-    public function scopeAtivo($query)
+    public function alunos(): BelongsToMany
+    {
+        return $this->belongsToMany(Aluno::class, 'matriculas')
+                    ->withPivot(['id', 'codigo_matricula', 'turma_id', 'data_matricula', 'status'])
+                   
+                    ->withTimestamps();
+                }
+
+    public function scopeAtivo(Builder $query): Builder
     {
         return $query->where('ativo', true);
-    }
+    }            
 
-    public function scopePorNivel($query, $nivel)
+     public function scopeDaEscola(Builder $query, int $escolaId): Builder
+    {
+        return $query->where('escola_id', $escolaId);
+    }
+    public function scopePorNivel(Builder $query, string $nivel): Builder
     {
         return $query->where('nivel_curso', $nivel);
     }
-
-    public function scopePorArea($query, $area)
+    public function scopePorArea(Builder $query, string $area): Builder
     {
         return $query->where('area_curso', $area);
     }
 
-    public function gerarNumeroMatricula()
+       public function gerarMatriculaUnica(): string
     {
-        $this->ultimo_numero = ($this->ultimo_numero ?? 0) + 1;
-        $this->save();
+        return DB::transaction(function () {
+            $curso = self::whereKey($this->id)->lockForUpdate()->firstOrFail();
 
-        return $this->sigla . str_pad($this->ultimo_numero, 5, '0', STR_PAD_LEFT);
+            do {
+                $curso->ultimo_numero = ($curso->ultimo_numero ?? 0) + 1;
+                $codigoMatricula = $curso->sigla . str_pad((string) $curso->ultimo_numero, 5, '0', STR_PAD_LEFT);
+            } while ($this->matriculaExiste($codigoMatricula));
+
+            $curso->save();
+            $this->ultimo_numero = $curso->ultimo_numero;
+
+            return $codigoMatricula;
+        });
     }
 
-    public function matriculaExiste($codigoMatricula)
+    public function matriculaExiste(string $codigoMatricula): bool
     {
         return Matricula::where('codigo_matricula', $codigoMatricula)->exists();
-    }
-
-    public function gerarMatriculaUnica()
-    {
-        do {
-            $codigoMatricula = $this->gerarNumeroMatricula();
-        } while ($this->matriculaExiste($codigoMatricula));
-
-        return $codigoMatricula;
     }
 
     public static function validarSigla($sigla)

@@ -2,25 +2,31 @@
 
 namespace App\Livewire;
 
+use App\Models\PreCadastro;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\PreCadastro;
-use livewire\WithFileUploads;
-use Maatwebsite\Excel\Facades;
 
 class PreRegistroTable extends Component
 {
     use WithPagination;
 
-    public $search = '';
+    public string $search = '';
 
     public function render()
     {
-        $preRegistros = PreRegistro::with(['role', 'escola'])
-            ->when($this->search, function ($query) {
-                $query->where('nome', 'like', '%' . $this->search . '%')
-                      ->orWhere('email_institucional', 'like', '%' . $this->search . '%')
-                      ->orWhere('email_pessoal', 'like', '%' . $this->search . '%');
+        $escolaId = Auth::user()?->escola_id;
+
+        $preRegistros = PreCadastro::with(['role', 'escola'])
+            ->when($escolaId, fn (Builder $query, int $id) => $query->daEscola($id))
+            ->when($this->search, function (Builder $query) {
+                $termo = '%' . $this->search . '%';
+                $query->where(function (Builder $q) use ($termo) {
+                    $q->where('nome', 'like', $termo)
+                        ->orWhere('email_institucional', 'like', $termo)
+                        ->orWhere('email_pessoal', 'like', $termo);
+                });
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -28,11 +34,15 @@ class PreRegistroTable extends Component
         return view('livewire.pre-registro-table', compact('preRegistros'));
     }
 
-    public function delete($id)
+    public function delete(int $id): void
     {
-        $preRegistro = PreRegistro::findOrFail($id);
+        $escolaId = Auth::user()?->escola_id;
+
+        $preRegistro = PreCadastro::when($escolaId, fn (Builder $q, int $eId) => $q->daEscola($eId))
+            ->findOrFail($id);
+
         $preRegistro->delete();
-        
-        session()->flash('message', 'Pré-registro deletado com sucesso!');
+
+        session()->flash('message', 'Pré-cadastro excluído com sucesso!');
     }
 }
