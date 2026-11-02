@@ -29,8 +29,9 @@
 public/storage
 
 # Ambientes
-#.env.backup
-#.env.production
+.env
+.env.*
+!.env.example
 
 # Logs
 *.log
