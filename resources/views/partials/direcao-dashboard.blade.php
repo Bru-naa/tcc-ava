@@ -1,12 +1,11 @@
 <div class="h-auto w-auto mx-auto mb-6">
     <flux:select wire:model="semestre" placeholder="Escolha o semestre...">
-        <flux:option value="2024/1">2024/1</flux:option>
-        <flux:option value="2024/2">2024/2</flux:option>
-        <flux:option value="2025/1">2025/1</flux:option>
-        <flux:option value="2025/2">2025/2</flux:option>
+        <flux:select.option value="2024/1">2024/1</flux:select.option>
+        <flux:select.option value="2024/2">2024/2</flux:select.option>
+        <flux:select.option value="2025/1">2025/1</flux:select.option>
+        <flux:select.option value="2025/2">2025/2</flux:select.option>
     </flux:select>
 </div>
-
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
 
@@ -46,7 +45,7 @@
         </div>
     </div>
 
-    <div class="bg-white p-6 rounded-xl shadow-lg border">
+    <div class="bg-white p-6 rounded-xl shadow-lg border md:col-span-2">
         <h3 class="text-lg font-semibold mb-4 text-gray-800 text-center">
             Perfil Comportamental - Dificuldades no Ensino
         </h3>

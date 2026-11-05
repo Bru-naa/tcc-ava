@@ -1,5 +1,5 @@
 <!-- accordion -->
-<div class="hs-accordion-group mt-4">
+<div class="hs-accordion-group mt-4 text-center">
   <div class="hs-accordion active bg-white border border-gray-200 -mt-px first:rounded-t-lg last:rounded-b-lg dark:bg-neutral-800 dark:border-neutral-700" id="hs-bordered-heading-one">
     <button class="hs-accordion-toggle hs-accordion-active:text-blue-600 inline-flex items-center gap-x-3 w-full font-semibold text-start text-gray-800 py-4 px-5 hover:text-gray-500 disabled:opacity-50 disabled:pointer-events-none dark:hs-accordion-active:text-blue-500 dark:text-neutral-200 dark:hover:text-neutral-400 dark:focus:outline-none dark:focus:text-neutral-400" aria-expanded="true" aria-controls="hs-basic-bordered-collapse-one">
       <svg class="hs-accordion-active:hidden block size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -11,7 +11,7 @@
       </svg>
       O que é o AvaliaEdu?
     </button>
-    <div id="hs-basic-bordered-collapse-one" class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="hs-bordered-heading-one">
+    <div id="hs-basic-bordered-collapse-one" class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 text-center" role="region" aria-labelledby="hs-bordered-heading-one">
       <div class="pb-6 px-5">
         <p class="text-gray-700 dark:text-neutral-300 leading-relaxed">
           O <strong class="text-blue-600 dark:text-blue-400">AvaliaEdu</strong> é uma plataforma desenvolvida para facilitar a comunicação entre instituições de ensino e sua comunidade acadêmica.

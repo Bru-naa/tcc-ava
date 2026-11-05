@@ -57,6 +57,18 @@ class Curso extends Model
                     ->withTimestamps();
                 }
 
+    public function coordenadores(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'coord_perfil', 'curso_id', 'user_id')
+            ->withTimestamps();
+    }
+
+    public function professores(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'curso_professor', 'curso_id', 'user_id')
+            ->withTimestamps();
+    }
+
     public function scopeAtivo(Builder $query): Builder
     {
         return $query->where('ativo', true);

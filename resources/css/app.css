@@ -3,13 +3,7 @@
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-
 @source '../../vendor/livewire/flux/stubs/**/*.blade.php';
-@import "tailwindcss";
-
-/* Preline UI */
-/* Flux / vendor css */
-@import '../../vendor/livewire/flux/dist/flux.css';
 
 /* Preline UI (apenas o CSS) */
 @import "../../node_modules/preline/variants.css";
