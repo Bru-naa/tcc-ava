@@ -144,7 +144,7 @@ Após rodar `php artisan migrate:fresh --seed`, você pode testar o login em **h
 - **Beatriz:** Levantamento e documentação dos requisitos iniciais, desenvolvimento de telas front-end e modelagem do sistema.
 - **Bruna:** Desenvolvimento back-end, integração Laravel com chatbot, *code reviews*, gestão de tarefas e **Auditoria Arquitetural / Refatoração Técnica (`v2.0` — 01/11/2026)**.
 - **Laiane:** Design das telas no Figma (`v1.0`), definição do fluxo do chatbot via WhatsApp e execução de testes da aplicação.
-- **Luiz:** Desenvolvimento front-end, modelagem do banco de dados e organização das atividades no Kanban.
+- **Luiz:** Desenvolvimento front-end, modelagem do banco de dados e organização das atividades no Trello.
 
 ---
 
