@@ -167,8 +167,8 @@ Após rodar `php artisan migrate:fresh --seed`, você pode testar o login em **h
 
 ## 📄 Documentação de Requisitos e Evolução Técnica
 
-O documento consolidado de requisitos e melhorias do MVP encontra-se na raiz do projeto:
-- [`Documento_de_Requisitos_AVALIAEDU_V02.pdf`](./Documento_de_Requisitos_AVALIAEDU_V02.pdf)
+O documento consolidado de requisitos e melhorias do MVP encontra-se na pasta `docs/`:
+- [`Documento_de_Requisitos_AVALIAEDU_V02.pdf`](./docs/Documento_de_Requisitos_AVALIAEDU_V02.pdf)
 
 > [!NOTE]
 > ### 📌 Nota — Evolução Técnica e Ajustes (`v1.0` AS-IS → `v2.0` TO-BE)
@@ -184,6 +184,6 @@ O documento consolidado de requisitos e melhorias do MVP encontra-se na raiz do 
 > | **5. Padrão PSR-4 e Livewire 3** | Colisão de classe PSR-4, namespaces do Livewire 2, `emitSelf` antigo e `sleep(3)` travando a requisição. | Alinhamento ao autoloader PSR-4, eventos `#[On]` / `$this->dispatch()` do Livewire 3 e remoção do `sleep(3)`. |
 > | **6. Portabilidade (`SQLite`/`MySQL`)** | Comando `SET FOREIGN_KEY_CHECKS=0` exclusivo do MySQL impedindo os seeders de rodarem em SQLite. | Uso de `Schema::disableForeignKeyConstraints()` compatível tanto com SQLite quanto com MySQL. |
 >
-> 📄 **Detalhamento completo dos 16 ajustes e requisitos:** [`Documento_de_Requisitos_AVALIAEDU_V02.pdf`](./Documento_de_Requisitos_AVALIAEDU_V02.pdf)
+> 📄 **Detalhamento completo dos 16 ajustes e requisitos:** [`Documento_de_Requisitos_AVALIAEDU_V02.pdf`](./docs/Documento_de_Requisitos_AVALIAEDU_V02.pdf)
 
 
