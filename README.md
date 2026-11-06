@@ -170,7 +170,7 @@ Após rodar `php artisan migrate:fresh --seed`, você pode testar o login em **h
 
 ## Tela Inicial
 
-![Home](docs/tela-home.png)
+![Home](docs/tela-home1.png)
 ![Home](docs/tela-home2.png)
 ![Home](docs/tela-home3.png)
 
