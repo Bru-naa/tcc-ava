@@ -144,9 +144,10 @@ Após rodar `php artisan migrate:fresh --seed`, você pode testar o login em **h
 ## 👥 Equipe do Projeto (Concepção TCC `v1.0` & Refatoração `v2.0`)
 
 - **Beatriz:** Levantamento e documentação dos requisitos iniciais, desenvolvimento de telas front-end e modelagem do sistema.
-- **Bruna:** Desenvolvimento back-end, integração Laravel com chatbot, *code reviews*, gestão de tarefas e **Auditoria Arquitetural / Refatoração Técnica (`v2.0` — 01/11/2026)**.
+- **Bruna:** Desenvolvimento back-end, integração Laravel com chatbot, *code reviews*, gestão de tarefas, revisão e **Ajustes/ Organização do Repositório (`v2.0` — 01/11/2026)**.
 - **Laiane:** Design das telas no Figma (`v1.0`), definição do fluxo do chatbot via WhatsApp e execução de testes da aplicação.
 - **Luiz:** Desenvolvimento front-end, modelagem do banco de dados e organização das atividades no Trello.
+- Orientador Vinicius Ximenes.
 
 ---
 
@@ -185,7 +186,7 @@ O documento consolidado de requisitos e melhorias do MVP encontra-se na pasta `d
 > [!NOTE]
 > ### 📌 Nota — Evolução Técnica e Ajustes (`v1.0` AS-IS → `v2.0` TO-BE)
 >
-> O projeto passou por ajustes em **16 pontos** para viabilizar o funcionamento ponta a ponta, mitigar gargalos de banco de dados e adequar o código aos padrões do Laravel 12 e Livewire 3:
+> O projeto passou por ajustes em **16 pontos** para organização do repositório, mitigar gargalos de banco de dados e adequação para o Laravel 12 e Livewire 3:
 >
 > | Dimensão | Como Era (`AS-IS` — `v1.0`) | Como Ficou (`TO-BE` — `v2.0`) |
 > | :--- | :--- | :--- |
