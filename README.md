@@ -3,7 +3,7 @@
 O **AvaliaEdu** é uma plataforma web institucional voltada à gestão de avaliações semestrais, ouvidoria escolar (manifestações, reclamações e elogios) e acompanhamento pedagógico em escolas técnicas e redes de ensino.
 
 ![Tela de Login](docs/tela-login.png)
----
+
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -168,15 +168,15 @@ Após rodar `php artisan migrate:fresh --seed`, você pode testar o login em **h
 ---
 ## 📸 Telas do Sistema
 
-## Perfil - Coordenação
-![Home - perfis](docs/tela-coordenadora.png)
-
 ## Tela Inicial
 
-![Home - perfis](docs/tela-home.png)
-![Home - perfis](docs/tela-home2.png)
-![Home - perfis](docs/tela-home3.png)
----
+![Home](docs/tela-home.png)
+![Home](docs/tela-home2.png)
+![Home](docs/tela-home3.png)
+
+## Perfil - Coordenação
+![Perfil - Coordenação](docs/tela-coordenadora.png)
+
 ## 📄 Documentação de Requisitos e Evolução Técnica
 
 O documento consolidado de requisitos e melhorias do MVP encontra-se na pasta `docs/`:
