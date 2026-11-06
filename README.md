@@ -44,7 +44,7 @@ Certifique-se de ter instalado em sua máquina:
 
 ### 1. Clonar o repositório
 ```bash
-git clone <URL_DO_SEU_REPOSITORIO>
+git clone https://github.com/Bru-naa/tcc-ava.git
 cd tcc-ava
 ```
 
